@@ -70,11 +70,9 @@ if(!class_exists('FPD_Shortcode_Order')) {
 			);
 
 			if( $inserted ) {
-                
-                $insert_id = $wpdb->insert_id;
 
 				$additional_data = array(
-					'order_id' => $insert_id,
+					'order_id' => $wpdb->insert_id,
 					'customer_name' => $customer_name,
 					'customer_mail' => $customer_mail
 				);
@@ -86,10 +84,7 @@ if(!class_exists('FPD_Shortcode_Order')) {
 
 				$fpd_data = apply_filters( 'fpd_new_order_item_data', $fpd_data, 'shortcode', $additional_data );
 
-				$to_mail = fpd_get_option('fpd_shortcode_order_mail_addresses');
-				if(empty($to_mail))
-					$to_mail = get_option('admin_email');
-				
+				$to_mail = get_option('admin_email');
 				$subject = sprintf( __('New Order received from %s', 'radykal'), $customer_name );
 
 				$message  = sprintf( __('New Order received from %s.', 'radykal'), $customer_name)."\n\n";
@@ -100,14 +95,14 @@ if(!class_exists('FPD_Shortcode_Order')) {
 				$message .= "====================================\n\n";
 				$message .= sprintf( __('View Order: %s', 'radykal'), esc_url_raw( admin_url('admin.php?page=fpd_orders') ) )."\n";
 
-				$to_mail = apply_filters( 'fpd_shortcode_order_mail_to', $to_mail, $insert_id, $order_data );
-				$subject = apply_filters( 'fpd_shortcode_order_mail_subject', $subject, $insert_id, $order_data );
-				$message = apply_filters( 'fpd_shortcode_order_mail_message', $message, $insert_id, $order_data );
-				$headers = apply_filters( 'fpd_shortcode_order_mail_headers', '', $insert_id, $order_data );
-				$attachments = apply_filters( 'fpd_shortcode_order_mail_attachments', array(), $insert_id, $order_data );
+				$to_mail = apply_filters( 'fpd_shortcode_order_mail_to', $to_mail, $wpdb->insert_id, $order_data );
+				$subject = apply_filters( 'fpd_shortcode_order_mail_subject', $subject, $wpdb->insert_id, $order_data );
+				$message = apply_filters( 'fpd_shortcode_order_mail_message', $message, $wpdb->insert_id, $order_data );
+				$headers = apply_filters( 'fpd_shortcode_order_mail_headers', '', $wpdb->insert_id, $order_data );
+				$attachments = apply_filters( 'fpd_shortcode_order_mail_attachments', array(), $wpdb->insert_id, $order_data );
 
-				do_action('fpd_shortcode_order_mail', $inserted, $customer_name, $customer_mail, $message, $insert_id, $order_data );
-                
+				do_action('fpd_shortcode_order_mail', $inserted, $customer_name, $customer_mail, $message, $wpdb->insert_id, $order_data );
+
 				wp_mail( $to_mail, $subject, $message, $headers, $attachments );
 				return $inserted;
 

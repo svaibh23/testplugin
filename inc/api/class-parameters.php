@@ -56,11 +56,6 @@ if(!class_exists('FPD_Parameters')) {
 				'showInColorSelection' => 'boolval',
 				'boundingBox' => function($value) { return is_array($value) ? $value : strval($value); },
 				'fixed' => 'boolval',
-				'copyable' => 'boolval',
-				'shadowColor' => 'strval',
-				'shadowBlur' => 'intval',
-				'shadowOffsetX' => 'intval',
-				'shadowOffsetY' => 'intval',
 				//old (needs to be present)
 				'x' => 'floatval',
 				'y' => 'floatval',
@@ -93,10 +88,8 @@ if(!class_exists('FPD_Parameters')) {
 				'adds_designs' => 'boolval',
 				'uploadZoneMovable' => 'boolval',
 				'uploadZoneRemovable' => 'boolval',
-				'relatedViewImages' => function($value) { return is_string($value) ? json_decode($value, true) : array(); },
 				//old (needs to be present)
 				'scale' => 'floatval',
-				
 			);
 
 		}
@@ -129,16 +122,18 @@ if(!class_exists('FPD_Parameters')) {
 				'widthFontSize' => 'intval',
 				'textBox' => 'boolval',
 				'width' => 'floatval', //textbox
+				'shadowColor' => 'strval',
+				'shadowBlur' => 'intval',
+				'shadowOffsetX' => 'intval',
+				'shadowOffsetY' => 'intval',
 				'textNumberPlaceholder' => 'strval',
 				'numberPlaceholderMin' => 'intval',
 				'numberPlaceholderMax' => 'intval',
 				'textLinkGroup' => 'strval',
 				'pattern' => 'strval',
 				'strokeColors' => function($value) { return empty($value) ? array() : explode(',',  preg_replace('/\s+/', '', $value)); },
-				'neonText' => 'boolval',
 				//old (needs to be present)
 				'textSize' => 'intval',
-				'maxCurveRadius' => 'intval'
 			);
 
 		}
@@ -231,7 +226,7 @@ if(!class_exists('FPD_Parameters')) {
 
 			}
 
-			//bounding box
+			//bounding box (old)
 			if( empty($parameters['bounding_box_control']) ) {
 
 				//use custom bounding box
@@ -248,11 +243,10 @@ if(!class_exists('FPD_Parameters')) {
 						) {
 
 						$json_data['boundingBox'] = array(
-							'x' => intval($parameters['bounding_box_x']),
-							'y' => intval($parameters['bounding_box_y']),
-							'width' => intval($parameters['bounding_box_width']),
-							'height' => intval($parameters['bounding_box_height']),
-							'borderRadius' => intval(isset($parameters['bounding_box_borderRadius']) ? $parameters['bounding_box_borderRadius'] : 0),
+							'x' => floatval($parameters['bounding_box_x']),
+							'y' => floatval($parameters['bounding_box_y']),
+							'width' => floatval($parameters['bounding_box_width']),
+							'height' => floatval($parameters['bounding_box_height']),
 						);
 
 					}

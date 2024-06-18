@@ -1,6 +1,5 @@
 <?php
 
-
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 if(!class_exists('FPD_WC_Cart')) {
@@ -8,8 +7,6 @@ if(!class_exists('FPD_WC_Cart')) {
 	class FPD_WC_Cart {
 
 		public function __construct() {
-
-			$cross_sell_display = get_option('fpd_cross_sells_display', 'none');
 
 			//ADD_TO_CART process
 			//add additional [fpd_data]([fpd_product],[fpd_price]) to cart item
@@ -36,13 +33,8 @@ if(!class_exists('FPD_WC_Cart')) {
 			add_filter( 'woocommerce_cart_item_subtotal', array(&$this, 'cart_item_price'), 10, 3 );
 
 			add_filter( 'woocommerce_cart_item_quantity', array(&$this, 'set_quantity_input_field'), 10, 3 );
-			
-			if( $cross_sell_display !== 'none' )
-				add_action( 'woocommerce_cart_collaterals', array(&$this, 'cross_sells_display'), 20 );
 
-			//names & numbers
-			add_action( 'woocommerce_after_cart_item_name', array(&$this, 'after_cart_item_name'), 10, 2 );
-
+			//add_action( 'woocommerce_cart_collaterals', array(&$this, 'cross_sells_display'), 20 );
 
 		}
 
@@ -65,6 +57,7 @@ if(!class_exists('FPD_WC_Cart')) {
 
 			</style>
 			<script type="text/javascript">
+
 				jQuery(document).ready(function() {
 
 					var $cartItems = jQuery('.cart_item .product-thumbnail img');
@@ -76,7 +69,11 @@ if(!class_exists('FPD_WC_Cart')) {
 
 					}
 
+
+
 				});
+
+
 			</script>
 			<?php
 
@@ -102,6 +99,10 @@ if(!class_exists('FPD_WC_Cart')) {
 
 				if( isset($_POST['fpd_print_order']) )
 					$cart_item_meta['fpd_data']['fpd_print_order'] = $_POST['fpd_print_order'];
+
+				//PLUS
+				if( isset($_POST['fpd_bulk_variations_order']) && !empty($_POST['fpd_bulk_variations_order']))
+					$cart_item_meta['fpd_data']['fpd_bulk_variations_order'] = strip_tags( $_POST['fpd_bulk_variations_order'] );
 
 			}
 
@@ -202,46 +203,23 @@ if(!class_exists('FPD_WC_Cart')) {
 
 				//get fpd data
 				$fpd_data = $cart_item['fpd_data'];
-				
 
 				if( isset($fpd_data['fpd_product']) && $fpd_data['fpd_product'] ) {
 
 					$order = json_decode(stripslashes($fpd_data['fpd_product']), true);
-
-					if(isset($order['product'])) {
-
+					if( array_key_exists('product', $order) )
 						$views = $order['product'];
+					else
+						$views = $order; //deprecated: getProduct() as used instead getOrder()
 
-						//display relevant elements with props
-						$display_elements = self::get_display_elements( $views );
-						foreach($display_elements as $display_element) {
+					//display relevant elements with props
+					$display_elements = self::get_display_elements( $views );
+					foreach($display_elements as $display_element) {
 
-							array_push($other_data, array(
-								'name' => '<span class="fpd-cart-item-meta-title">'.$display_element['title'].'</span>',
-								'value' => $display_element['values']
-							));
-
-						}
-
-						if( isset($order['bulkVariations']) ) {
-
-							require_once(FPD_PLUGIN_DIR.'/inc/addons/class-bulk-variations.php');
-
-							$bulk_variations = $order['bulkVariations'];
-							
-							if( !empty($bulk_variations) ) {
-		
-								foreach($bulk_variations as $variation) {
-		
-									array_push($other_data, array(
-										'name' => FPD_Bulk_Variations::create_variation_string($variation['variation']),
-										'value' => $variation['quantity']
-									));
-		
-								}
-		
-							}
-						}
+						array_push($other_data, array(
+							'name' => '<span style="font-weight: normal;font-size:0.95em;">'.$display_element['title'].'</span>',
+							'value' => $display_element['values']
+						));
 
 					}
 
@@ -278,7 +256,6 @@ if(!class_exists('FPD_WC_Cart')) {
 				libxml_clear_errors();
 				$doc = $dom->getElementsByTagName("a")->item(0);
 				$href = $xpath->query(".//@href");
-				
 				foreach ( $href as $s ) {
 					$url = $s->nodeValue;
 
@@ -295,16 +272,14 @@ if(!class_exists('FPD_WC_Cart')) {
 
 				if( fpd_get_option('fpd_cart_show_element_props') === 'used_colors' ) {
 
-					$fpd_data = $cart_item['fpd_data'];					
+					$fpd_data = $cart_item['fpd_data'];
 					$order = json_decode(stripslashes($fpd_data['fpd_product']), true);
-					
-					if(isset($order['product'])) {
-
+					if( array_key_exists('product', $order) )
 						$views = $order['product'];
-						$link .= '<div style="margin-top:10px;" class="fpd-wc-cart-element-colors fpd-clearfix">'.implode('',self::get_display_elements( $views, 'used_colors' )).'</div>';
+					else
+						$views = $order; //deprecated: getProduct() as used instead getOrder()
 
-					}
-					
+					$link .= '<div style="margin-top:10px;" class="fpd-wc-cart-element-colors fpd-clearfix">'.implode('',self::get_display_elements( $views, 'used_colors' )).'</div>';
 
 				}
 
@@ -334,11 +309,11 @@ if(!class_exists('FPD_WC_Cart')) {
 					foreach ( $src as $s ) {
 						$s->nodeValue = $fpd_data['fpd_product_thumbnail'];
 					}
-					
-					foreach ( $srcset as $s ) {						
-						$s->nodeValue = '';
+
+					foreach ( $srcset as $s ) {
+						$s->nodeValue = $fpd_data['fpd_product_thumbnail'];
 					}
-					
+
 					return $dom->saveXML( $doc );
 
 		        }
@@ -457,7 +432,7 @@ if(!class_exists('FPD_WC_Cart')) {
 
 							$title = isset($elementParams['text']) ? $elementParams['text'] : $viewElement['title'];
 							$display_elements[] = array(
-								'title' => $title,
+								'title' => strlen($title) > 20  ? substr($title, 0, 17) . '...' : $title,
 								'values' => implode(' ', $values)
 							);
 
@@ -475,8 +450,7 @@ if(!class_exists('FPD_WC_Cart')) {
 
 		public static function color_display( $color_arr ) {
 
-			$color_html = '';
-			$color_arr = array_unique($color_arr);
+			$color_html = '<div style="float: left;">';
 			foreach($color_arr as $color_value) {
 
 				$hex =  strtolower(str_replace('#', '', $color_value));
@@ -488,44 +462,18 @@ if(!class_exists('FPD_WC_Cart')) {
 				if( !empty($hex_title) ) {
 
 					$color_contrast = fpd_get_contrast_color($color_value);
-					$color_html .= '<span class="fpd-cart-element-color" style="border-radius:4px;float: left;margin: 0 4px 6px 0; padding: 1px 3px; border: 1px solid #f2f2f2; white-space: nowrap; font-size: 11px;background: '.$color_value.'; color:'.$color_contrast.'">'.strtoupper($hex_title).'</span>';
+					$color_html .= '<span class="fpd-cart-element-color" style="white-space: nowrap; border:1px solid #f2f2f2;font-size:11px;margin-right:4px;padding:2px 3px;background: '.$color_value.'; color:'.$color_contrast.'">'.strtoupper($hex_title).'</span>';
 
 				}
 
 
 			}
 
+			$color_html .= '</div>';
 
 			return $color_html;
 
 		}
-
-		public function after_cart_item_name( $cart_item, $cart_item_key ) {
-
-			if ( isset($cart_item['fpd_data']) ) {
-
-				$fpd_data = $cart_item['fpd_data'];
-
-				if( isset($fpd_data['fpd_product']) ) {
-
-					require_once(FPD_PLUGIN_DIR.'/inc/addons/class-names-numbers.php');
-
-					$fpd_product = json_decode(stripslashes($fpd_data['fpd_product']), true);
-
-					if(isset($fpd_product['product'])) {
-
-						$views = $fpd_product['product'];
-
-						FPD_Names_Numbers::display_names_numbers_items($views);
-
-					}
-					
-
-				}
-
-			}
-
-	    }
 
 	}
 }

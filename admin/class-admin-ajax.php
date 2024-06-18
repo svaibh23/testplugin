@@ -61,9 +61,9 @@ if(!class_exists('FPD_Admin_Ajax')) {
 			add_action( 'wp_ajax_fpd_create_file_export', array( &$this, 'create_file_export' ) );
 
 			// - settings
+			add_action( 'wp_ajax_fpd_check_api_key', array( &$this, 'check_api_key' ) );
 			add_action( 'wp_ajax_fpd_upload_font', array( &$this, 'upload_font' ) );
 			add_action( 'wp_ajax_fpd_delete_font', array( &$this, 'delete_font' ) );
-			add_action( 'wp_ajax_fpd_install_3d_model', array( &$this, 'install_3d_model' ) );
 
 			// - status
 			add_action( 'wp_ajax_fpd_reset_image_sources', array( &$this, 'reset_image_sources' ) );
@@ -79,8 +79,7 @@ if(!class_exists('FPD_Admin_Ajax')) {
 
 			check_ajax_referer( 'fpd_ajax_nonce' );
 
-			$name = preg_replace('!\s+!', '', $_POST['name']);
-			$success = update_option( 'fpd_notification_' . $name, true );
+			$success = update_option( 'fpd_notification_' . $_POST['name'], true );
 
 			echo json_encode(array(
 				'name' => $_POST['name'],
@@ -96,7 +95,7 @@ if(!class_exists('FPD_Admin_Ajax')) {
 			check_ajax_referer( 'fpd_ajax_nonce' );
 
 			$config = array(
-				'threeJsModels' => FPD_3D_Preview::get_installed_models()
+				'threeJsModels' => FPD_3D_Preview::get_models_configs()
 			);
 
 			echo( json_encode($config) );
@@ -200,11 +199,10 @@ if(!class_exists('FPD_Admin_Ajax')) {
 
 			check_ajax_referer( 'fpd_ajax_nonce' );
 
-			$product_id = intval( $_GET['id'] );
+			$product_id = $_GET['id'];
 			//$product_id = 11;
 
 			if( !class_exists('ZipArchive') ) {
-				wp_send_json_error( 'ZipArchive extension is not enabled in your PHP environment.', 500 );
 				die;
 			}
 
@@ -414,7 +412,7 @@ if(!class_exists('FPD_Admin_Ajax')) {
 
 			check_ajax_referer( 'fpd_ajax_nonce' );
 
-			$response = FPD_Resource_Views::get_product_view( intval( $_GET['id'] ) );
+			$response = FPD_Resource_Views::get_product_view( $_GET['id'] );
 
 			if(is_wp_error( $response )) {
 				wp_send_json_error($response->get_error_message(), 500);
@@ -548,7 +546,7 @@ if(!class_exists('FPD_Admin_Ajax')) {
 		public function get_ui_layouts() {
 
 			check_ajax_referer( 'fpd_ajax_nonce' );
-			
+
 			$response = FPD_Resource_UI_Layouts::get_ui_layouts();
 
 			if(is_wp_error( $response )) {
@@ -657,7 +655,7 @@ if(!class_exists('FPD_Admin_Ajax')) {
 
 			check_ajax_referer( 'fpd_ajax_nonce' );
 
-			$response = FPD_Resource_Designs::get_single_category( intval( $_GET['id'] ) );
+			$response = FPD_Resource_Designs::get_single_category( $_GET['id'] );
 
 			if(is_wp_error( $response )) {
 				wp_send_json_error($response->get_error_message(), 500);
@@ -768,7 +766,7 @@ if(!class_exists('FPD_Admin_Ajax')) {
 
 		}
 
-		public function update_order() {			
+		public function update_order() {
 
 			check_ajax_referer( 'fpd_ajax_nonce' );
 
@@ -820,11 +818,13 @@ if(!class_exists('FPD_Admin_Ajax')) {
 			//print-ready export
 			if( isset($payload['print_ready']) && $payload['print_ready'] ) {
 
-				if( Fancy_Product_Designer::pro_export_enabled() ) {
+				if( class_exists('Fancy_Product_Designer_Export') ) {
 
 					try {
 
-						$res = Fancy_Product_Designer::create_print_ready_file( $payload );						
+						$payload['api_version'] = 2.1;
+
+						$res = Fancy_Product_Designer_Export::create_print_ready_file( $payload );
 
 						if( is_string($res) ) { //a string is returned as response which holds the file url to download
 							$file_url = content_url( '/fancy_products_orders/print_ready_files/' . $res );
@@ -880,6 +880,42 @@ if(!class_exists('FPD_Admin_Ajax')) {
 
 		}
 
+		public function check_api_key() {
+
+			if ( !isset($_POST['api_key']) )
+				exit;
+
+			check_ajax_referer( 'fpd_ajax_nonce', '_ajax_nonce' );
+
+			$url = add_query_arg( array('api_key' => $_POST['api_key']), Fancy_Product_Designer::get_cloud_admin_api_url() . 'has_plan/premium' );
+			$cloud_response = fpd_http_post_json( $url );
+
+			$ajax_res = array(
+				'api_key' => $_POST['api_key']
+			);
+
+			if( $cloud_response && isset( $cloud_response->error_code ) ) {
+
+				$ajax_res['error_code'] = $cloud_response->error_code;
+
+
+
+			}
+			else if( $cloud_response && isset( $cloud_response->created_at )) {
+
+				$ajax_res['created_at'] = $cloud_response->created_at;
+				update_option( 'fpd_ae_admin_api_key', $_POST['api_key'] );
+
+			}
+
+			header('Content-Type: application/json');
+			echo json_encode(
+				$ajax_res
+			);
+
+			die;
+		}
+
 		public function upload_font() {
 
 			check_ajax_referer( 'fpd_ajax_nonce' );
@@ -933,62 +969,6 @@ if(!class_exists('FPD_Admin_Ajax')) {
 
 			echo json_encode( FPD_Settings_Fonts::get_custom_fonts(false) );
 
-			die;
-
-		}
-
-		public function install_3d_model() {
-
-			check_ajax_referer( 'fpd_ajax_nonce' );
-
-			$payload = json_decode( file_get_contents('php://input'), true );
-
-			if ( !isset($payload['model']) )
-				exit;
-
-			$downloaded_filename = fpd_admin_copy_file( $payload['model']['url'], FPD_3D_Preview::$root_dir );
-
-			if( $downloaded_filename ) {
-
-				$local_zip_path = FPD_3D_Preview::$root_dir . $downloaded_filename;
-
-				$zip = new ZipArchive;
-				$zip_res = $zip->open($local_zip_path);
-				
-				if ($zip_res === TRUE) {
-
-					@unlink($local_zip_path);
-					$zip->extractTo( FPD_3D_Preview::$root_dir );
-					$zip->close();
-
-					// Remove the '__MACOSX/' folder, if it exists
-					$macosx_dir = FPD_3D_Preview::$root_dir . '__MACOSX';
-					if (is_dir($macosx_dir)) {
-						// Recursive directory removal
-						$files = new RecursiveIteratorIterator(
-							new RecursiveDirectoryIterator($macosx_dir, FilesystemIterator::SKIP_DOTS),
-							RecursiveIteratorIterator::CHILD_FIRST
-						);
-
-						foreach ($files as $fileinfo) {
-							$todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
-							$todo($fileinfo->getRealPath());
-						}
-
-						rmdir($macosx_dir);
-					}
-
-				}
-
-			}
-			else {
-				
-				wp_send_json_error('ZIP could not be downloaded. Please try again!', 500);
-				die;
-
-			}
-
-			echo json_encode( FPD_3D_Preview::get_installed_models() );
 			die;
 
 		}

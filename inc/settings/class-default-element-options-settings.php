@@ -158,15 +158,6 @@ if( !class_exists('FPD_Settings_Default_Element_Options') ) {
                         'column_width' => 'eight',
                         'unbordered'      => true
 					),
-
-					array(
-						'title' => __( 'Duplicatable', 'radykal' ),
-						'id' 		=> 'fpd_designs_parameter_copyable',
-						'default'	=> 'no',
-						'type' 		=> 'checkbox',
-                        'column_width' => 'eight',
-                        'unbordered'      => true
-					),
                     
                     array(
                         'title' 		=> __('Bounding Box', 'radykal'),
@@ -187,7 +178,6 @@ if( !class_exists('FPD_Settings_Default_Element_Options') ) {
 							'fpd_designs_parameter_bounding_box_y' => false,
 							'fpd_designs_parameter_bounding_box_width' => false,
 							'fpd_designs_parameter_bounding_box_height' => false,
-							'fpd_designs_parameter_bounding_box_borderRadius' => false,
 						)
 
 					),
@@ -254,19 +244,6 @@ if( !class_exists('FPD_Settings_Default_Element_Options') ) {
 					),
 
 					array(
-						'title' 	=> __( 'Border Radius', 'radykal' ),
-						'id' 		=> 'fpd_designs_parameter_bounding_box_borderRadius',
-						'css' 		=> 'width:70px;',
-						'default'	=> 0,
-						'type' 		=> 'number',
-						'custom_attributes' => array(
-							'min' 	=> 0,
-							'step' 	=> 1
-						),
-                        'column_width' => 'eight'
-					),
-
-					array(
 						'title' => __( 'Mode', 'radykal' ),
                         'description' 		=> __( 'The mode defines the behaviour of the added image inside the bounding box.', 'radykal' ),
 						'id' 		=> 'fpd_designs_parameter_boundingBoxMode',
@@ -278,7 +255,8 @@ if( !class_exists('FPD_Settings_Default_Element_Options') ) {
 							'limitModify' => __('Limit Modification', 'radyal'),
 							'none' => __('None', 'radyal'),
 						),
-                        'column_width' => 'sixteen',
+                        'column_width' => 'eight',
+                        'unbordered'      => true
 					),
 
 					array(
@@ -291,7 +269,7 @@ if( !class_exists('FPD_Settings_Default_Element_Options') ) {
 							'fit' => __('Fit', 'radyal'),
 							'cover' => __('Cover', 'radyal')
 						),
-                        'column_width' => 'sixteen',
+                        'column_width' => 'eight',
                         'unbordered'      => true
 					),
                     
@@ -428,8 +406,8 @@ if( !class_exists('FPD_Settings_Default_Element_Options') ) {
                     ),
                     
                     array(
-                        'title' 	=> __( 'Minimum DPI', 'radykal' ),
-                        'description' 		=> __( 'The minimum allowed DPI for images (JPG or PNG). When the DPI is below this value, the user will see a warning.', 'radykal' ),
+                        'title' 	=> __( 'Minimum JPEG DPI', 'radykal' ),
+                        'description' 		=> __( 'The minimum allowed DPI for JPEG images.', 'radykal' ),
                         'id' 		=> 'fpd_uploaded_designs_parameter_minDPI',
                         'css' 		=> 'width:70px;',
                         'default'	=> '72',
@@ -493,7 +471,7 @@ if( !class_exists('FPD_Settings_Default_Element_Options') ) {
 
 					array(
 						'title' => __( 'Advanced Editing', 'radykal' ),
-						'description' 		=> __( 'Enables an advanced editing for bitmap images like filters and remove background.', 'radykal' ),
+						'description' 		=> __( 'The advanced image editor will be enabled, the user has the possibility to set a custom mask or to manipulate the image colors.', 'radykal' ),
 						'id' 		=> 'fpd_uploaded_designs_parameter_advancedEditing',
 						'default'	=> 'no',
 						'type' 		=> 'checkbox',
@@ -501,9 +479,10 @@ if( !class_exists('FPD_Settings_Default_Element_Options') ) {
 					),
 
 					array(
-						'title' 	=> __( 'ImageMagick Filter', 'radykal' ),
-						'description' 		=> __( 'Apply a image filter with ImageMagick when the customer uploads a media file.', 'radykal' ),
-						'id' 		=> 'fpd_imagick_filter',
+						'title' 	=> __( 'Filter', 'radykal' ),
+						'description' 		=> __( 'Set a filter when the image is added (Only JPEG or PNG).', 'radykal' ),
+						'id' 		=> 'fpd_uploaded_designs_parameter_filter',
+						'css' 		=> 	'width: 200px;',
 						'default'	=> '',
 						'type' 		=> 'select',
 						'options'	=> self::get_image_filters(),
@@ -790,6 +769,17 @@ if( !class_exists('FPD_Settings_Default_Element_Options') ) {
                     ),
                     
                     array(
+                        'title' 	=> __( 'Patterns', 'radykal' ),
+                        'description' 		=> __( 'Upload PNG or JPEG into wp-content/uploads/fpd_patterns_text.', 'radykal' ),
+                        'id' 		=> 'fpd_custom_texts_parameter_patterns',
+                        'css' 		=> 	'width: 100%;',
+                        'default'	=> '',
+                        'type' 		=> 'multiselect',
+                        'options'	=> self::get_pattern_urls(),
+                        'unbordered'      => true
+                    ),
+                    
+                    array(
                         'title' 		=> __('Curving', 'radykal'),
                         'type' 			=> 'section-title',
                         'id' 			=> 'custom-texts-curving-section'
@@ -800,14 +790,6 @@ if( !class_exists('FPD_Settings_Default_Element_Options') ) {
 						'description' 		=> __( 'Let the customer make the text curved?', 'radykal' ),
 						'id' 		=> 'fpd_custom_texts_parameter_curvable',
 						'default'	=> 'yes',
-						'type' 		=> 'checkbox',
-                        'column_width' => 'eight',
-					),
-
-					array(
-						'title' => __( 'Reverse', 'radykal' ),
-						'id' 		=> 'fpd_custom_texts_parameter_curveReverse',
-						'default'	=> 'no',
 						'type' 		=> 'checkbox',
                         'column_width' => 'eight',
 					),
@@ -838,19 +820,13 @@ if( !class_exists('FPD_Settings_Default_Element_Options') ) {
 					),
 
 					array(
-						'title' => __( 'Max. Radius', 'radykal' ),
-						'id' 		=> 'fpd_custom_texts_parameter_maxCurveRadius',
-						'default'	=> 400,
-						'type' 		=> 'number',
-						'custom_attributes' => array(
-							'min' 	=> 1,
-							'step' 	=> 1
-						),
+						'title' => __( 'Reverse', 'radykal' ),
+						'id' 		=> 'fpd_custom_texts_parameter_curveReverse',
+						'default'	=> 'no',
+						'type' 		=> 'checkbox',
                         'column_width' => 'eight',
                         'unbordered'      => true
 					),
-
-					
                     
                     array(
                         'title' 		=> __('Bounding Box', 'radykal'),
@@ -1085,16 +1061,6 @@ if( !class_exists('FPD_Settings_Default_Element_Options') ) {
                         'default'	=> '',
                         'class'		=> 'widefat',
                         'type' 		=> 'multi-color-input',
-                    ),
-
-					array(
-                        'title' 	=> __( 'Patterns', 'radykal' ),
-                        'description' 		=> __( 'Upload PNG or JPEG into wp-content/uploads/fpd_patterns_text.', 'radykal' ),
-                        'id' 		=> 'fpd_custom_texts_parameter_patterns',
-                        'css' 		=> 	'width: 100%;',
-                        'default'	=> '',
-                        'type' 		=> 'multiselect',
-                        'options'	=> self::get_pattern_urls(),
                         'unbordered'      => true
                     ),
                 
@@ -1163,9 +1129,16 @@ if( !class_exists('FPD_Settings_Default_Element_Options') ) {
 			return array(
 				'none' => 'None',
 				'grayscale' => 'Grayscale',
+				'sepia' => 'Sepia',
+				'sepia2' => 'Sepia Two',
+				'cold' => 'Cold',
 				'black_white' => 'Black & White',
-				'threshold' => 'Threshold',
-				'threshold_negative' => 'Threshold Negative'
+				'old' => 'Old',
+				'milk' => 'Milk',
+				'vintage' => 'Vintage',
+				'kodachrome' => 'Kodachrome',
+				'technicolor' => 'Technicolor',
+				'monochrome' => 'Monochrome'
 			);
 
 		}

@@ -10,111 +10,6 @@ if( !class_exists('FPD_Settings_Advanced') ) {
 
 			return apply_filters('fpd_advanced_settings', array(
 
-				'layout' => array(
-
-					array(
-						'title' => __( 'Max. Canvas Height', 'radykal' ),
-						'description' 		=> __( 'The maximum canvas height related to the window height. A percentage number between 0 and 100, e.g. 80 will set a maximum canvas height of 80% of the window height. A value of 100 will disable a calculation of a max. height.', 'radykal' ),
-						'id' 		=> 'fpd_maxCanvasHeight',
-						'css' 		=> 'width:60px;',
-						'default'	=> '100',
-						'type' 		=> 'number',
-						'custom_attributes' => array(
-							'min' 	=> 0,
-							'max' 	=> 100,
-							'step' 	=> 1
-						),
-					),
-
-					array(
-						'title' => __( 'Canvas Wrapper Height', 'radykal' ),
-						'description' 		=> __( 'You can set a fixed wrapper height (e.g. 800px) or use "auto" and the canvas wrapper height is dynamically calculated by the canvas height set for the view of the product.', 'radykal' ),
-						'id' 		=> 'fpd_canvasHeight',
-						'default'	=> 'auto',
-						'type' 		=> 'text',
-                        'unbordered'      => true
-					),
-
-					array(
-						'title' 	=> __( 'Canvas Touch Scrolling', 'radykal' ),
-						'description'	 => __( 'Enable touch gesture to scroll on canvas.', 'radykal' ),
-						'id' 		=> 'fpd_canvas_touch_scrolling',
-						'default'	=> 'no',
-						'type' 		=> 'checkbox',
-					),
-
-					array(
-						'title' 	=> __( 'Responsive', 'radykal' ),
-						'description'	 	=> __( 'Resizes the canvas and all elements in the canvas, so that all elements are displaying properly in the canvas container. This is useful, when your canvas is larger than the available space in the parent container.', 'radykal' ),
-						'id' 		=> 'fpd_responsive',
-						'default'	=> 'yes',
-						'type' 		=> 'checkbox',
-					),
-
-					array(
-						'title' 		=> __( 'Hide On Smartphones', 'radykal' ),
-						'description'	=> __( 'Hide product designer on smartphones.', 'radykal'),
-						'id' 			=> 'fpd_disable_on_smartphones',
-						'default'		=> 'no',
-						'type' 			=> 'checkbox',
-					),
-
-					array(
-						'title' 		=> __( 'Hide On Tablets', 'radykal' ),
-						'description'	=> __( 'Hide product designer on tablets.', 'radykal' ),
-						'id' 			=> 'fpd_disable_on_tablets',
-						'default'		=> 'no',
-						'type' 			=> 'checkbox',
-					),
-
-					array(
-						'title' 		=> __( 'Corner Controls Style', 'radykal' ),
-						'id' 			=> 'fpd_corner_controls_style',
-						'default'		=> 'advanced',
-						'type' 			=> 'radio',
-						'description'	=>  __( 'The style for corner controls when an element is selected.', 'radykal' ),
-						'options'		=> array(
-							'advanced' 		=> __( 'Advanced: Scale, Rotate, Delete, Duplicate', 'radykal' ),
-							'basic' 		=> __( 'Basic: Scale, Rotate', 'radykal' ),
-						),
-                        'unbordered'      => true
-					),
-
-					array(
-						'title' 		=> __('Responsive Breakpoints', 'radykal'),
-						'type' 			=> 'section-title',
-						'id' 			=> 'misc-responsive-breakpoints'
-					),
-
-					array(
-						'title' => __( 'Small', 'radykal' ),
-						'description' 		=> __( 'The responsive breakpoint for small devices such as smartphones.', 'radykal' ),
-						'id' 		=> 'fpd_responsive_breakpoint_small',
-						'css' 		=> 'width:60px;',
-						'default'	=> '768',
-						'type' 		=> 'number',
-						'custom_attributes' => array(
-							'min' 	=> 0,
-							'step' 	=> 1
-						),
-					),
-
-					array(
-						'title' => __( 'Medium', 'radykal' ),
-						'description' 		=> __( 'The responsive breakpoint for medium devices such as tablets and small laptops.', 'radykal' ),
-						'id' 		=> 'fpd_responsive_breakpoint_medium',
-						'css' 		=> 'width:60px;',
-						'default'	=> '1024',
-						'type' 		=> 'number',
-						'custom_attributes' => array(
-							'min' 	=> 0,
-							'step' 	=> 1
-						),
-						'unbordered'      => true
-					),
-
-				),
-
 				'misc' => array(
 
 					array(
@@ -127,6 +22,18 @@ if( !class_exists('FPD_Settings_Advanced') ) {
 							'none'	 => __( 'None', 'radykal' ),
 							'any'	 => __( 'ANY view needs to be customized.', 'radykal' ),
 							'all'	 => __( 'ALL views needs to be customized.', 'radykal' ),
+						)
+					),
+
+					array(
+						'title' 	=> __( 'Toolbar Textarea Position', 'radykal' ),
+						'description' 		=> __( 'The position of the textarea in the toolbar for editing text elements.', 'radykal' ),
+						'id' 		=> 'fpd_toolbarTextareaPosition',
+						'default'	=> 'sub',
+						'type' 		=> 'radio',
+						'options'   => array(
+							'sub'	 => __( 'Sub-Panel: Textarea opens via button in toolbar.', 'radykal' ),
+							'top'	 => __( 'Top-Level: Textarea is at the top when toolbar opens.', 'radykal' ),
 						)
 					),
 
@@ -171,6 +78,22 @@ if( !class_exists('FPD_Settings_Advanced') ) {
 					),
 
 					array(
+						'title' 	=> __( 'Canvas Touch Scrolling', 'radykal' ),
+						'description'	 => __( 'Enable touch gesture to scroll on canvas.', 'radykal' ),
+						'id' 		=> 'fpd_canvas_touch_scrolling',
+						'default'	=> 'no',
+						'type' 		=> 'checkbox',
+					),
+
+					array(
+						'title' 	=> __( 'Split Multi-Paths SVG', 'radykal' ),
+						'description'	 => __( 'Split SVG with multiple paths via advanced editing tool.', 'radykal' ),
+						'id' 		=> 'fpd_splitMultiSVG',
+						'default'	=> 'no',
+						'type' 		=> 'checkbox',
+					),
+
+					array(
 						'title' 	=> __( 'Per-Pixel Detection', 'radykal' ),
 						'description'	 => __( 'Object detection happens on per-pixel basis rather than on per-bounding-box. This means transparency of an object is not clickable.', 'radykal' ),
 						'id' 		=> 'fpd_canvas_per_pixel_detection',
@@ -183,6 +106,14 @@ if( !class_exists('FPD_Settings_Advanced') ) {
 						'description'	 => __( 'If the image (custom uploaded or design) is larger than the canvas, it will be scaled down to fit into the canvas.', 'radykal' ),
 						'id' 		=> 'fpd_fitImagesInCanvas',
 						'default'	=> 'yes',
+						'type' 		=> 'checkbox',
+					),
+
+					array(
+						'title' 	=> __( 'Set Textbox Width', 'radykal' ),
+						'description'	 => __( 'The users are able to set or change the width of a textbox in the frontend.', 'radykal' ),
+						'id' 		=> 'fpd_setTextboxWidth',
+						'default'	=> 'no',
 						'type' 		=> 'checkbox',
 					),
 
@@ -206,6 +137,30 @@ if( !class_exists('FPD_Settings_Advanced') ) {
 						'title' 	=> __( 'Hide Dialog On Add', 'radykal' ),
 						'description'	 => __( 'The dialog/off-canvas panel will be closed as soon as an element is added to the canvas.', 'radykal' ),
 						'id' 		=> 'fpd_hide_dialog_on_add',
+						'default'	=> 'yes',
+						'type' 		=> 'checkbox',
+					),
+
+					array(
+						'title' 	=> __( 'Lazy Load', 'radykal' ),
+						'description'	 	=> __( 'Enable lazy loading for the images in the products and designs containers.', 'radykal' ),
+						'id' 		=> 'fpd_lazy_load',
+						'default'	=> 'yes',
+						'type' 		=> 'checkbox',
+					),
+
+					array(
+						'title' 	=> __( 'Improved Image Resize Quality', 'radykal' ),
+						'description'	 	=> __( 'Enable a filter that improves the quality of a resized bitmap image. This could take a long time for large images.', 'radykal' ),
+						'id' 		=> 'fpd_improvedResizeQuality',
+						'default'	=> 'no',
+						'type' 		=> 'checkbox',
+					),
+
+					array(
+						'title' 	=> __( 'Responsive', 'radykal' ),
+						'description'	 	=> __( 'Resizes the canvas and all elements in the canvas, so that all elements are displaying properly in the canvas container. This is useful, when your canvas is larger than the available space in the parent container.', 'radykal' ),
+						'id' 		=> 'fpd_responsive',
 						'default'	=> 'yes',
 						'type' 		=> 'checkbox',
 					),
@@ -235,8 +190,16 @@ if( !class_exists('FPD_Settings_Advanced') ) {
 					),
 
 					array(
-						'title' 	=> __( 'Size Tooltip', 'radykal' ),
-						'description'	 => __( 'Display the size of the current selected element in a tooltip.', 'radykal' ),
+						'title' 	=> __( 'Show Modal In Designer', 'radykal' ),
+						'description'	 => __( 'Display some modals (info, qr-code etc.) in the designer instead in the whole page.', 'radykal' ),
+						'id' 		=> 'fpd_openModalInDesigner',
+						'default'	=> 'no',
+						'type' 		=> 'checkbox',
+					),
+
+					array(
+						'title' 	=> __( 'Image Size Tooltip', 'radykal' ),
+						'description'	 => __( 'Display the image size in pixels of the current selected image in a tooltip.', 'radykal' ),
 						'id' 		=> 'fpd_imageSizeTooltip',
 						'default'	=> 'no',
 						'type' 		=> 'checkbox',
@@ -251,9 +214,9 @@ if( !class_exists('FPD_Settings_Advanced') ) {
 					),
 
 					array(
-						'title' 	=> __( 'Apply Size When Replacing', 'radykal' ),
-						'description'	 => __( 'When an element is replaced, apply size from replaced element to added element.', 'radykal' ),
-						'id' 		=> 'fpd_applySizeWhenReplacing',
+						'title' 	=> __( 'Multiple Elements Selection', 'radykal' ),
+						'description'	 => __( 'Select multiple elements in the frontend with mouse (Hold-Down) or touch gestures on mobile. Only possible when "Corner Controls Style" option is set to "Basic"', 'radykal' ),
+						'id' 		=> 'fpd_multiSelection',
 						'default'	=> 'no',
 						'type' 		=> 'checkbox',
 					),
@@ -275,14 +238,6 @@ if( !class_exists('FPD_Settings_Advanced') ) {
 					),
 
 					array(
-						'title' 	=> __( 'Multiple Elements Selection', 'radykal' ),
-						'description' 		=> __( 'Users can select multiple elements simultaneously by holding down the left mouse button. ', 'radykal' ),
-						'id' 		=> 'fpd_multiSelection',
-						'default'	=> 'yes',
-						'type' 		=> 'checkbox',
-					),
-
-					array(
 						'title' => __( 'Bounding Box Stroke Width', 'radykal' ),
 						'description' 		=> __( 'The stroke width of the bounding box when an element is selected.', 'radykal' ),
 						'id' 		=> 'fpd_bounding_box_stroke_width',
@@ -299,6 +254,7 @@ if( !class_exists('FPD_Settings_Advanced') ) {
 						'title' => __( 'Highlight Editable Objects', 'radykal' ),
 						'description' 		=> __( 'Highlight objects (editable texts and upload zones) with a dashed border. To enable this just define a hexadecimal color value.', 'radykal' ),
 						'id' 		=> 'fpd_highlightEditableObjects',
+						'css' 		=> 'width:100px;',
 						'default'	=> '',
 						'type' 		=> 'text'
 					),
@@ -313,45 +269,44 @@ if( !class_exists('FPD_Settings_Advanced') ) {
 						'custom_attributes' => array(
 							'min' 	=> 0,
 							'step' 	=> 1
-						),
-						'unbordered'      => true
+						)
 					),
 
 					array(
-						'title' => __( 'Shortcoder Order Mail Notification', 'radykal' ),
-						'description' 		=> __( 'Enter a comma-separated list of email addresses to send the order notfication when using shortcode (NOT WooCommerce). By default it will be sent to the admin mail address.', 'radykal' ),
-						'id' 		=> 'fpd_shortcode_order_mail_addresses',
-						'default'	=> get_option('admin_email'),
-						'type' 		=> 'text'
+						'title' => __( 'Max. Canvas Height', 'radykal' ),
+						'description' 		=> __( 'The maximum canvas height related to the window height. A percentage number between 0 and 100, e.g. 80 will set a maximum canvas height of 80% of the window height. A value of 100 will disable a calculation of a max. height.', 'radykal' ),
+						'id' 		=> 'fpd_maxCanvasHeight',
+						'css' 		=> 'width:60px;',
+						'default'	=> '100',
+						'type' 		=> 'number',
+						'custom_attributes' => array(
+							'min' 	=> 0,
+							'max' 	=> 100,
+							'step' 	=> 1
+						),
+                        'unbordered'      => true
 					),
+
 
 				), //layout-skin
 
 				'troubleshooting' => array(
 
 					array(
-						'title' 		=> __( 'Debug Mode', 'radykal' ),
-						'description' 	=> __( 'Enables Theme-Check modal and loads the unminified Javascript files.', 'radykal' ),
-						'id' 			=> 'fpd_debug_mode',
-						'default'		=> 'no',
-						'type' 			=> 'checkbox'
+						'title' 	=> __( 'Debug Mode', 'radykal' ),
+						'description' 		=> __( 'Enables Theme-Check modal and loads the unminified Javascript files.', 'radykal' ),
+						'id' 		=> 'fpd_debug_mode',
+						'default'	=> 'no',
+						'type' 		=> 'checkbox'
 					),
 
 					array(
-						'title' 		=> __( 'Disable Guided Tours in Admin', 'radykal' ),
-						'description' 	=> __( 'Disable all guided tours and checklists (Usetiful) in admin.', 'radykal' ),
-						'id' 			=> 'fpd_disable_usetiful',
-						'default'		=> 'no',
-						'type' 			=> 'checkbox',
-					),
-
-					array(
-						'title' 		=> __( 'WooCommerce Product Image CSS Selector', 'radykal' ),
-						'description' 	=> __( 'Sometimes, themes or page builder plugins use their own CSS classes for the WooCommerce product image instead of the default ones provided by WooCommerce. This can cause our solution to fail in detecting the product image container when the "Update Product Image" option is enabled, preventing the image from being replaced as intended.', 'radykal' ),
-						'id' 			=> 'fpd_wc_product_image_css_selector',
-						'default'		=> '',
-						'placeholder'	=> __( 'e.g. .image-slide img', 'radykal' ),
-						'type' 			=> 'text'
+						'title' 	=> __( 'jQuery No-Conflict Mode', 'radykal' ),
+						'description' 		=> __( 'Enables jQuery No-Conflict mode. If your website uses another library using the $ as an alias, enable this option.', 'radykal' ),
+						'id' 		=> 'fpd_jquery_no_conflict',
+						'default'	=> 'no',
+						'type' 		=> 'checkbox',
+                        'unbordered'      => true
 					),
 
 				),

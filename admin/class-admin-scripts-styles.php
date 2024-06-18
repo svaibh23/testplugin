@@ -14,12 +14,10 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 			add_action( 'admin_head', array( &$this, 'global_admin_head'), 100 );
 			add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_styles_scripts' ), 1000 );
 			add_action( 'admin_head-fancy-product-designer_page_fpd_ui_layout_composer', array( &$this, 'print_css_string' ), 100 );
-			add_action( 'admin_footer', array( &$this, 'global_admin_footer' ) );
 
 		}
 
 		public function global_admin_head () {
-			
 			?>
 			<script type="text/javascript">
 
@@ -48,6 +46,8 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 					});
 
 				});
+
+
 
 			</script>
 			<?php
@@ -97,7 +97,7 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 
 		public function enqueue_styles_scripts( $hook ) {
 
-			global $post, $pagenow, $typenow;
+			global $post;
 
 			$version = Fancy_Product_Designer::LOCAL ? time() : Fancy_Product_Designer::VERSION;
 
@@ -105,11 +105,11 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 			require_once( FPD_PLUGIN_ADMIN_DIR . '/labels/order-viewer.php' );
 			$order_viewer_opts = array(
 				'labels' => json_encode( FPD_Labels_Order_Viewer::get_labels() ),
-				'printReadyExportEnabled' => Fancy_Product_Designer::pro_export_enabled(),
+				'templatesDirectory' => plugins_url('/assets/templates/', FPD_PLUGIN_ROOT_PHP ),
+				'printReadyExportEnabled' => class_exists('Fancy_Product_Designer_Export'),
 				'options' => array(
-					'enabled_fonts' => FPD_Fonts::to_data(FPD_Fonts::get_enabled_fonts())
-				),
-				'export_method' => get_option( 'fpd_pro_export_method', 'svg2pdf' )
+					'enabled_fonts' => json_decode(FPD_Fonts::to_json(FPD_Fonts::get_enabled_fonts()))
+				)
 			);
 
 			wp_localize_script( 'fpd-admin', 'fpd_admin_opts', array(
@@ -120,39 +120,40 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 				)
 			);
 
-			//wc order details
-			if(  $typenow === 'shop_order' || $hook === 'woocommerce_page_wc-orders' ) {
-
-				wp_enqueue_style( 'fpd-react-order-viewer', plugins_url('/react-app/css/wc-order-viewer.css', __FILE__), array(
-					'fpd-semantic-ui',
-					'fpd-js'
-				), $version );
-
-				wp_enqueue_script( 'fpd-react-order-viewer', plugins_url('/react-app/js/wc-order-viewer.js', __FILE__), array(
-					'fpd-semantic-ui',
-					'fpd-admin',
-					'fpd-js',
-				), Fancy_Product_Designer::VERSION);
-
-			}
-
-			//edit post
 		    if ( $hook == 'post-new.php' || $hook == 'post.php' ) {
 
+				//wc order details
+		        if( 'shop_order' === $post->post_type ) {
+
+			        wp_enqueue_style( 'fpd-react-order-viewer', plugins_url('/react-app/css/wc-order-viewer.css', __FILE__), array(
+						'fpd-semantic-ui',
+						'jquery-fpd'
+					), $version );
+
+					wp_enqueue_script( 'fpd-react-order-viewer', plugins_url('/react-app/js/wc-order-viewer.js', __FILE__), array(
+						'fpd-semantic-ui',
+						'fpd-admin',
+						'jquery-fpd',
+					), Fancy_Product_Designer::VERSION);
+
+		        }
 		        //post/pages
-		        wp_enqueue_style( 'wp-color-picker' );
-				wp_enqueue_style( 'fpd-admin' );
-				wp_enqueue_style( 'fpd-semantic-ui' );
+		        else {
 
-				wp_enqueue_script( 'wp-color-picker' );
-				wp_enqueue_script( 'fpd-admin' );
+			        wp_enqueue_style( 'wp-color-picker' );
+					wp_enqueue_style( 'fpd-admin' );
+					wp_enqueue_style( 'fpd-semantic-ui' );
 
-				if( !wp_script_is('select2') && !wp_script_is('select2-avada-js') ) {
-					wp_enqueue_style( 'radykal-select2' );
-					wp_enqueue_script( 'radykal-select2' );
-				}
-				wp_enqueue_script( 'radykal-select-sortable' );
+					wp_enqueue_script( 'wp-color-picker' );
+					wp_enqueue_script( 'fpd-admin' );
 
+					if( !wp_script_is('select2') && !wp_script_is('select2-avada-js') ) {
+						wp_enqueue_style( 'radykal-select2' );
+						wp_enqueue_script( 'radykal-select2' );
+					}
+					wp_enqueue_script( 'radykal-select-sortable' );
+
+		        }
 		    }
 
 			//manage fancy products
@@ -195,7 +196,7 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 
 		    	wp_enqueue_style( 'fpd-react-product-builder', plugins_url('/react-app/css/product-builder.css', __FILE__), array(
 			    	'radykal-select2',
-			    	'fpd-js',
+			    	'jquery-fpd',
 					'fpd-semantic-ui'
 				), $version );
 
@@ -207,7 +208,7 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 					'fpd-semantic-ui',
 					'radykal-select2',
 					'fpd-admin',
-					'fpd-js'
+					'jquery-fpd'
 				), $version );
 
 				wp_add_inline_script( 'fpd-react-product-builder', self::REACT_NO_CONFLICT_JS, 'after' );
@@ -221,6 +222,7 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 					'enabled_fonts',
 					'primary_layout_props',
 					'design_categories',
+					'plus_enabled',
 					'fpd_custom_texts_parameter_maxFontSize',
 					'fpd_custom_texts_parameter_patterns',
 					'fpd_designs_parameter_patterns',
@@ -258,7 +260,7 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 				wp_enqueue_style( 'fpd-ui-layout-composer', plugins_url('/react-app/css/ui-composer.css', __FILE__), array(
 					'fpd-semantic-ui',
 					'fpd-admin',
-					'fpd-js'
+					'jquery-fpd'
 				), $version );
 
 				wp_enqueue_script( 'fpd-ui-layout-composer', plugins_url('/react-app/js/ui-composer.js', __FILE__), array(
@@ -267,7 +269,7 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 					'jquery-ui-sortable',
 					'jquery-ui-droppable',
 					'fpd-semantic-ui',
-					'fpd-js',
+					'jquery-fpd',
 					'fpd-admin'
 				), $version );
 
@@ -276,7 +278,7 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 				$script_options = array(
 					'labels' => json_encode(FPD_Labels_UI_Composer::get_labels()),
 					'templates_directory' => plugins_url('/assets/templates/', FPD_PLUGIN_ROOT_PHP ),
-					'languages' => FPD_Settings_Labels::get_active_lang_codes(),
+					'languages' => FPD_Resource_Options::get_languages(),
 					'dynamic_designs_modules' => fpd_get_option('fpd_dynamic_designs_modules'),
 					'ui_theme' => fpd_get_option('fpd_ui_theme')
 				);
@@ -321,69 +323,20 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 
 				wp_enqueue_style( 'fpd-shortcode-orders', plugins_url('/react-app/css/shortcode-orders.css', __FILE__), array(
 					'fpd-semantic-ui',
-					'fpd-js'
+					'jquery-fpd'
 				), $version );
 
 				wp_enqueue_script( 'fpd-admin' );
 
 				wp_enqueue_script( 'fpd-shortcode-orders', plugins_url('/react-app/js/shortcode-orders.js', __FILE__), array(
 					'fpd-semantic-ui',
-					'fpd-js'
+					'jquery-fpd'
 				), $version );
 
 				wp_add_inline_script( 'fpd-shortcode-orders', self::REACT_NO_CONFLICT_JS, 'after' );
 				wp_localize_script( 'fpd-shortcode-orders', 'fpd_order_viewer_opts', $order_viewer_opts );
 
 	        }
-
-			//pricing rules
-			if( $hook == 'fancy-product-designer_page_fpd_pricing_builder' ) {
-
-				require_once( FPD_PLUGIN_ADMIN_DIR . '/labels/pricing-rules.php' );
-
-				wp_enqueue_style( 
-					'fpd-react-pricing-rules', 
-					plugins_url('/react-app/css/pricing-rules.css', __FILE__), 
-					array(
-						'fpd-semantic-ui'
-					), 
-					$version
-				);
-
-				wp_enqueue_script( 
-					'fpd-react-pricing-rules', 
-					plugins_url('/react-app/js/pricing-rules.js', __FILE__), 
-					array(
-						'fpd-semantic-ui',
-						'fpd-admin',
-						'jquery-ui-core',
-						'jquery-ui-mouse',
-						'jquery-ui-sortable',
-						'jquery-ui-droppable',
-					), 
-					$version
-				);
-
-				wp_add_inline_script( 
-					'fpd-react-pricing-rules', 
-					FPD_Admin_Scripts_Styles::REACT_NO_CONFLICT_JS, 
-					'after' 
-				);
-
-				wp_localize_script( 
-					'fpd-react-pricing-rules', 
-					'fpd_pricing_rules_opts', 
-					array(
-						'labels' 				=> json_encode(FPD_Labels_Pricing_Rules::get_labels()),
-						'pricing_rules_groups' 	=> FPD_Resource_Pricing_Rules::get_pricing_rules(),
-						'patterns'				=> array_merge(
-							FPD_Settings_Default_Element_Options::get_pattern_urls(),
-							FPD_Settings_Default_Element_Options::get_pattern_urls('svg')
-						)
-					)
-				);
-
-		    }
 
 			//settings
 			if( $hook == 'fancy-product-designer_page_fpd_settings') {
@@ -403,24 +356,21 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 
 				wp_add_inline_script( 'fpd-react-settings', self::REACT_NO_CONFLICT_JS, 'after' );
 
-				//deprecated: export addon
-				$all_options = FPD_Settings::$radykal_settings->settings;
-				if( isset($all_options['automated-export'])) {
-					unset($all_options['automated-export']);
-				}
-				//--deprecated end
+				$api_key = get_option( 'fpd_ae_admin_api_key', '' );
 
 				wp_localize_script( 'fpd-react-settings', 'fpd_settings_opts', array(
 					'labels' => FPD_Labels_Settings::get_labels(),
 					'configs' => array(
-						'all_options' 		=> $all_options,
-						'option_tabs' 		=> array_keys($all_options),
+						'plus_enabled' 		=> class_exists('Fancy_Product_Designer_Plus'),
+						'all_options' 		=> FPD_Settings::$radykal_settings->settings,
+						'option_tabs' 		=> array_keys(FPD_Settings::$radykal_settings->settings),
 						'option_blocks' 	=> FPD_Settings::$radykal_settings->block_titles,
-						'enabled_fonts' 	=> FPD_Fonts::to_data(FPD_Fonts::get_enabled_fonts()),
+						'enabled_fonts' 	=> json_decode(FPD_Fonts::to_json(FPD_Fonts::get_enabled_fonts())),
 						'custom_fonts' 		=> FPD_Settings_Fonts::get_custom_fonts(false),
-						'custom_fonts_dir' 	=> content_url( 'uploads/fpd_fonts/'),
-						'installed_3d_models' => FPD_3D_Preview::get_installed_models()
+						'custom_fonts_dir' 	=> content_url( 'uploads/fpd_fonts/')
 					),
+					'languages' => FPD_Resource_Options::get_languages(),
+					'automated_export_disabled' => empty($api_key) && !class_exists('Fancy_Product_Designer_Export')
 				) );
 
 			}
@@ -430,10 +380,11 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 
 				wp_enqueue_style( 'fpd-semantic-ui' );
 				wp_enqueue_style( 'fpd-admin' );
+				wp_enqueue_style( 'jquery-fpd-static' );
 
 				wp_enqueue_script( 'fpd-semantic-ui' );
 				wp_enqueue_script( 'fpd-admin' );
-				wp_enqueue_script( 'fpd-js' );
+				wp_enqueue_script( 'jquery-fpd' );
 
 				wp_enqueue_script( 'fpd-status-tools', plugins_url('/js/status-tools.js', __FILE__), false, $version );
 
@@ -444,38 +395,11 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 
 			}
 
-			//status
-			if( $hook == 'fancy-product-designer_page_fpd_genius') {
-
-				wp_enqueue_style( 'fpd-semantic-ui' );
-				wp_enqueue_style( 'fpd-admin' );
-
-				wp_enqueue_script( 'fpd-semantic-ui' );
-				wp_enqueue_script( 'fpd-admin' );
-
-				wp_enqueue_script( 'fpd-genius', plugins_url('/js/genius.js', __FILE__), false, $version );
-
-				wp_localize_script( 
-					'fpd-genius', 
-					'fpd_genius_opts', 
-					array(
-						
-					)
-				);
-
-			}
-
 			$order_id = 0;
-			if( isset($_GET['post']) && $typenow == 'shop_order' ) //wc (HPOS disabled)
+			if( isset($_GET['post']) ) //wc
 				$order_id = $_GET['post'];
-			else if( isset($_GET['page']) && isset($_GET['id']) && $_GET['page'] == 'wc-orders') //wc (HPOS enabled)
-				$order_id = $_GET['id'];
 			else if( isset($_GET['lid']) ) //gravity form
 				$order_id = $_GET['lid'];
-
-			$order_id = intval( $order_id );
-
-			$order_viewer_opts['order_id'] = $order_id;
 
 			$order_type = 'wc';
 			if( isset($_GET['page']) ) {
@@ -487,30 +411,8 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 
 			}
 
-			$order_type = sanitize_key( $order_type );
-
 			wp_add_inline_script( 'fpd-react-order-viewer', self::REACT_NO_CONFLICT_JS, 'after' );
 			wp_localize_script( 'fpd-react-order-viewer', 'fpd_order_viewer_opts', $order_viewer_opts );
-
-		}
-
-		public function global_admin_footer () {
-			
-			if( !fpd_get_option('fpd_disable_usetiful') ):
-				?>
-				<script>
-					(function (w, d, s) {
-						var a = d.getElementsByTagName('head')[0];
-						var r = d.createElement('script');
-						r.async = 1;
-						r.src = s;
-						r.setAttribute('id', 'usetifulScript');
-						r.dataset.token = "7147bc26ddfd1eb2397b9e43031503f5";
-											a.appendChild(r);
-					})(window, document, "https://www.usetiful.com/dist/usetiful.js");</script>
-				</script>
-				<?php
-			endif;
 
 		}
 	}

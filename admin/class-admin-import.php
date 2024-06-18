@@ -23,7 +23,6 @@ if( !class_exists('FPD_Admin_Import') ) {
 				$upload_dir = wp_upload_dir();
 				$upload_dir = $upload_dir['basedir'];
 				$extract_to_dir = $upload_dir . '/fpd_imports/';
-				
 				$local_zip_path = $extract_to_dir . $zip_name;
 
 				if( !file_exists($extract_to_dir) )
@@ -42,43 +41,14 @@ if( !class_exists('FPD_Admin_Import') ) {
 
 		}
 
-		public function extract_zip( $zip_path, $extract_to_dir, $zip_name, $add_to_media_library ) {
+		public function extract_zip( $local_zip_path, $extract_to_dir, $zip_name, $add_to_media_library ) {
 
-			if( !class_exists('ZipArchive') ) {
-				wp_send_json_error( 'ZipArchive extension is not enabled in your PHP environment.', 500 );
-			}
-			
-			$delete_temp_zip = false;
-			$res = '';
+			$this->add_to_media_library = $add_to_media_library;
 
-			$filename = fpd_admin_copy_file($zip_path, FPD_TEMP_DIR );
+			wp_mkdir_p( $extract_to_dir ); //imports folder
 
-			if( $filename ) {
-
-				$delete_temp_zip = true;
-				$zip_path = FPD_TEMP_DIR . $filename;
-				
-			}
-			else {
-
-				$res = 'Could not download zip.';
-
-			}
-
-			if( empty($res) ) {
-
-				$this->add_to_media_library = $add_to_media_library;
-
-				wp_mkdir_p( $extract_to_dir ); //imports folder
-
-				$zip = new ZipArchive;
-				$res = $zip->open($zip_path);
-
-				//delete zip from temp folder (only when downloaded)
-				if( $delete_temp_zip )
-					@unlink($zip_path);
-
-			}
+			$zip = new ZipArchive;
+			$res = $zip->open($local_zip_path);
 
 			if ($res === true) {
 
@@ -197,8 +167,8 @@ if( !class_exists('FPD_Admin_Import') ) {
 
 			}
 
-			// if( $this->add_to_media_library ) //only remove extraced dir when image are added to media library
-			// 	fpd_admin_delete_directory($dir);
+			if( $this->add_to_media_library ) //only remove extraced dir when image are added to media library
+				fpd_admin_delete_directory($dir);
 
 			return $fp_id;
 

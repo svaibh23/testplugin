@@ -97,14 +97,6 @@ if( !class_exists('FPD_Settings_WooCommerce') ) {
 					),
 
 					array(
-						'title' => __( 'AJAX Add-to-cart Mode', 'radykal' ),
-						'description' 		=> __( 'If your theme supports adding products to the cart through AJAX, it is recommended to enable this feature. This way, the loading indicator will not appear.', 'radykal' ),
-						'id' 		=> 'fpd_wc_ajax_add_to_cart_mode',
-						'default'	=> 'no',
-						'type' 		=> 'checkbox'
-					),
-
-					array(
 						'title' => __('Lightbox', 'radykal'),
 						'type' => 'section',
 						'id' => 'lightbox-section'

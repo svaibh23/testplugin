@@ -45,7 +45,7 @@ if( !class_exists('FPD_Fonts') ) {
 
 		}
 
-		public static function to_data( $fonts ) {
+		public static function to_json( $fonts ) {
 
 			$custom_fonts_vars = array(
 				'n7' => 'bold',
@@ -95,7 +95,7 @@ if( !class_exists('FPD_Fonts') ) {
 
 			}
 
-			return $json_fonts;
+			return json_encode($json_fonts);
 
 		}
 

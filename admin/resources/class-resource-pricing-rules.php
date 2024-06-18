@@ -6,6 +6,13 @@ if( !class_exists('FPD_Resource_Pricing_Rules') ) {
 
 		public static function get_pricing_rules(  ) {
 
+			if( !class_exists('Fancy_Product_Designer_Pricing') )
+				return new WP_Error(
+					'fpd-pricing-missing',
+					__('The Fancy Product Designer Pricing add-on is not installed in your WordPress site.', 'radykal')
+				);
+
+
 			return json_decode(fpd_strip_multi_slahes(get_option( 'fpd_pr_groups', '[]' )));
 
 		}

@@ -30,14 +30,13 @@ jQuery(document).ready(function($) {
 	var $scActionType = $modalShortcodes.find('#fpd-sc-action-type'),
 		scActionTypeVal = scActionLayoutVal = '';
 
-	for (const action in FPDActions.availableActions) {
-		
-		if(action !== 'zoom') {
-			$scActionType.append('<option value="'+action+'">'+toTitleCase(action.replace('-', ' '))+'</option>');
+	FPDActions.availableActions.forEach(function(type) {
+
+		if(type !== 'zoom') {
+			$scActionType.append('<option value="'+type+'">'+toTitleCase(type.replace('-', ' '))+'</option>');
 		}
 
-	}
-
+	});
 	$modalShortcodes.find('#fpd-action-attr select').change(function() {
 
 		if(this.id === 'fpd-sc-action-type') {
@@ -69,12 +68,6 @@ jQuery(document).ready(function($) {
 	//module
 	var $scModuleType = $modalShortcodes.find('#fpd-sc-module-type'),
 		scModuleTypeVal = scModuleStyleVal = '';
-
-	FPDMainBar.availableModules.forEach(moduleKey => {
-		
-		$scModuleType.append('<option value="'+moduleKey+'">'+toTitleCase(moduleKey.replace('-', ' '))+'</option>');
-
-	});
 
 	$modalShortcodes.on('change keyup', '#fpd-sc-module-type, #fpd-sc-module-css', function() {
 

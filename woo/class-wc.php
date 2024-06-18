@@ -17,7 +17,6 @@ if( !class_exists('FPD_WC_Index') ) {
 			require_once( 'class-wc-cart.php' );
 			require_once( 'class-wc-order.php' );
 			require_once( 'class-wc-cross-sells.php' );
-				
 
 			if( class_exists('WeDevs_Dokan') )
 				require_once( 'class-wc-dokan.php' );

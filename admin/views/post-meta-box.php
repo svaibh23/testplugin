@@ -26,71 +26,6 @@
 	$selected_products_mobile = isset( $custom_fields["fpd_products_mobile"] ) ? $custom_fields["fpd_products_mobile"][0] : "";
 	$selected_products_mobile = empty($selected_products_mobile)? array() : explode(',', $selected_products_mobile);
 
-
-	function fpd_meta_box_get_tab($screen, $screen_source_type, $screen_cats, $screen_products) {
-
-		$attr_suffix = $screen == 'desktop' ? '' : '_mobile';
-
-		$categories = FPD_Category::get_categories( array(
-			'order_by' => 'title ASC'
-		) );
-	
-		$products = FPD_Product::get_products( array(
-			'order_by' 	=> "ID ASC",
-		) );
-
-		ob_start();
-		?>
-		<div>
-			<label><strong><?php _e( 'Source Type', 'radykal' ); ?></strong></label>
-			<span style="padding-right: 20px;">
-				<input type="radio" name="fpd_source_type<?php echo $attr_suffix; ?>" value="category" <?php checked($screen_source_type, 'category') ?> />
-				<?php _e( 'Category', 'radykal' ); ?>
-			</span>
-			<span>
-				<input type="radio" name="fpd_source_type<?php echo $attr_suffix; ?>" value="product" <?php checked($screen_source_type, 'product') ?> />
-				<?php _e( 'Product', 'radykal' ); ?>
-			</span>
-		</div>
-		<div>
-			<div class="fpd-categories">
-				<label><strong><?php _e( 'Product Categories', 'radykal' ); ?></strong></label>
-				<select data-placeholder="<?php _e( 'Add categories to selection.', 'radykal' ); ?>" class="radykal-select-sortable" style="width: 100%;" data-selected="<?php echo implode(',', $screen_cats); ?>" name="fpd_product_categories<?php echo $attr_suffix; ?>">
-				<?php
-
-					foreach($categories as $category) {
-						$cat_title = fpd_xss_filter( '#'.$category->ID . ' - ' . $category->title );
-						echo '<option value="'.$category->ID.'" data-title="'.$cat_title.'">'.$cat_title.'</option>';
-					}
-
-				?>
-				</select>
-				<p class="description"><?php _e( 'Sort items by drag & drop.', 'radykal' ); ?></p>
-			</div>
-			<div class="fpd-products">
-				<label><strong><?php _e( 'Products', 'radykal' ); ?></strong></label>
-				<select data-placeholder="<?php _e( 'Add products to selection.', 'radykal' ); ?>" class="radykal-select-sortable" style="width: 100%;" name="fpd_products<?php echo $attr_suffix; ?>" data-selected="<?php echo implode(',', $screen_products); ?>">
-					<?php
-
-						foreach($products as $fpd_product) {
-							$product_title = '#'.$fpd_product->ID . ' - ' . $fpd_product->title;
-							$product_title = fpd_xss_filter( $product_title );;
-							echo '<option value="'.$fpd_product->ID.'" data-title="'.$product_title.'">'.$product_title.'</option>';
-						}
-
-					?>
-				</select>
-				<p class="description"><?php _e( 'Sort items by drag & drop.', 'radykal' ); ?></p>
-			</div>
-		</div>
-		<?php
-		$output = ob_get_contents();
-		ob_end_clean();
-
-		return $output;
-
-	}
-
 ?>
 <div class="ui pointing secondary menu radykal-tabs">
 	<a class="active item" data-tab-target="desktop"><?php _e('Desktop', 'radykal'); ?></a>
@@ -99,13 +34,109 @@
 
 <div class="radykal-tab" data-tab-target="desktop">
 
-	<?php echo fpd_meta_box_get_tab('desktop', $source_type, $selected_categories, $selected_products); ?>
+	<div>
+		<label><strong><?php _e( 'Source Type', 'radykal' ); ?></strong></label>
+		<span style="padding-right: 20px;">
+			<input type="radio" name="fpd_source_type" value="category" <?php checked($source_type, 'category') ?> />
+			<?php _e( 'Category', 'radykal' ); ?>
+		</span>
+		<span>
+			<input type="radio" name="fpd_source_type" value="product" <?php checked($source_type, 'product') ?> />
+			<?php _e( 'Product', 'radykal' ); ?>
+		</span>
+	</div>
+	<div>
+		<div class="fpd-categories">
+			<label><strong><?php _e( 'Product Categories', 'radykal' ); ?></strong></label>
+			<select data-placeholder="<?php _e( 'Add categories to selection.', 'radykal' ); ?>" class="radykal-select-sortable" style="width: 100%;" data-selected="<?php echo implode(',', $selected_categories); ?>" name="fpd_product_categories">
+			<?php
+
+				$categories = FPD_Category::get_categories( array(
+					'order_by' => 'title ASC'
+				) );
+
+				foreach($categories as $category) {
+					$cat_title = '#'.$category->ID . ' - ' . $category->title;
+					echo '<option value="'.$category->ID.'" data-title="'.$cat_title.'">'.$cat_title.'</option>';
+				}
+
+			?>
+			</select>
+			<p class="description"><?php _e( 'Sort items by drag & drop.', 'radykal' ); ?></p>
+		</div>
+		<div class="fpd-products">
+			<label><strong><?php _e( 'Products', 'radykal' ); ?></strong></label>
+			<select data-placeholder="<?php _e( 'Add products to selection.', 'radykal' ); ?>" class="radykal-select-sortable" style="width: 100%;" name="fpd_products" data-selected="<?php echo implode(',', $selected_products); ?>">
+				<?php
+
+					$products = FPD_Product::get_products( array(
+						'order_by' 	=> "ID ASC",
+					) );
+
+					foreach($products as $fpd_product) {
+						$product_title = '#'.$fpd_product->ID . ' - ' . $fpd_product->title;
+						echo '<option value="'.$fpd_product->ID.'" data-title="'.$product_title.'">'.$product_title.'</option>';
+					}
+
+				?>
+			</select>
+			<p class="description"><?php _e( 'Sort items by drag & drop.', 'radykal' ); ?></p>
+		</div>
+	</div>
 
 </div><!-- Tab: Desktop -->
 
 <div class="radykal-tab fpd-hidden" data-tab-target="mobile">
 
-	<?php echo fpd_meta_box_get_tab('mobile', $source_type_mobile, $selected_categories_mobile, $selected_products_mobile); ?>
+	<div>
+		<label><strong><?php _e( 'Source Type', 'radykal' ); ?></strong></label>
+		<span style="padding-right: 20px;">
+			<input type="radio" name="fpd_source_type_mobile" value="category" <?php checked($source_type_mobile, 'category') ?> />
+			<?php _e( 'Category', 'radykal' ); ?>
+		</span>
+		<span>
+			<input type="radio" name="fpd_source_type_mobile" value="product" <?php checked($source_type_mobile, 'product') ?> />
+			<?php _e( 'Product', 'radykal' ); ?>
+		</span>
+	</div>
+	<div>
+		<div class="fpd-categories">
+			<label><strong><?php _e( 'Product Categories', 'radykal' ); ?></strong></label>
+			<select data-placeholder="<?php _e( 'Add categories to selection.', 'radykal' ); ?>" class="radykal-select-sortable" style="width: 100%;" data-selected="<?php echo implode(',', $selected_categories_mobile); ?>" name="fpd_product_categories_mobile">
+			<?php
+
+				$categories = FPD_Category::get_categories( array(
+					'order_by' => 'title ASC'
+				) );
+
+				foreach($categories as $category) {
+					$cat_title = '#'.$category->ID . ' - ' . $category->title;
+					echo '<option value="'.$category->ID.'" data-title="'.$cat_title.'">'.$cat_title.'</option>';
+				}
+
+			?>
+			</select>
+			<p class="description"><?php _e( 'Sort items by drag & drop.', 'radykal' ); ?></p>
+		</div>
+		<div class="fpd-products">
+			<label><strong><?php _e( 'Products', 'radykal' ); ?></strong></label>
+			<select data-placeholder="<?php _e( 'Add products to selection.', 'radykal' ); ?>" class="radykal-select-sortable" style="width: 100%;" name="fpd_products_mobile" data-selected="<?php echo implode(',', $selected_products_mobile); ?>">
+				<?php
+
+					$products = FPD_Product::get_products( array(
+						'order_by' 	=> "ID ASC",
+					) );
+
+					foreach($products as $fpd_product) {
+						$product_title = '#'.$fpd_product->ID . ' - ' . $fpd_product->title;
+						echo '<option value="'.$fpd_product->ID.'" data-title="'.$product_title.'">'.$product_title.'</option>';
+					}
+
+				?>
+			</select>
+			<p class="description"><?php _e( 'Sort items by drag & drop.', 'radykal' ); ?></p>
+		</div>
+	</div>
 
 </div><!-- Tab: Mobile -->
 

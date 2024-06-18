@@ -14,25 +14,15 @@ if( !class_exists('FPD_Settings_Labels') ) {
 		}
 
 		public static function get_current_lang_code() {
-			
-			if( defined('ICL_LANGUAGE_CODE') ) {
 
-				$wpml_locale = '';				
-				foreach(apply_filters( 'wpml_active_languages', null ) as $languages__value) {
-					if ($languages__value['active']) { $wpml_locale = $languages__value['default_locale']; break; }
-				}
-
-				return $wpml_locale;
-
-			}
+			if( defined('ICL_LANGUAGE_CODE') )
+				return ICL_LANGUAGE_CODE;
 			else
 				return get_locale();
 
 		}
 
 		public static function get_default_lang() {
-
-			//self::update_default_lang();
 
 			$default_lang = get_option('fpd_lang_default');
 			if( empty($default_lang) ) {
@@ -64,8 +54,8 @@ if( !class_exists('FPD_Settings_Labels') ) {
 
 			$default_lang = json_decode(self::update_default_lang(), true);
 
-			$db_langs = $wpdb->get_results( $wpdb->prepare("SELECT * FROM {$wpdb->options} WHERE option_name LIKE %s AND option_name NOT LIKE 'fpd_lang_default' AND option_name NOT LIKE 'fpd_languages'", "fpd_lang_%") );
-			
+			$db_langs = $wpdb->get_results( $wpdb->prepare("SELECT * FROM {$wpdb->options} WHERE option_name LIKE %s AND option_name NOT LIKE 'fpd_lang_default'", "fpd_lang_%") );
+
 			foreach($db_langs as $db_lang) {
 
 				$lang = json_decode($db_lang->option_value, true);
@@ -81,11 +71,10 @@ if( !class_exists('FPD_Settings_Labels') ) {
 
 		public static function get_current_lang( $lang_code= false ) {
 
-			if($lang_code === false)
+			if($lang_code == false)
 				$lang_code = self::get_current_lang_code();
 
 			$current_lang = get_option('fpd_lang_'.$lang_code);
-			
 			if( empty($current_lang) ) {
 
 				$current_lang = file_get_contents(self::get_default_json_url());
@@ -98,15 +87,20 @@ if( !class_exists('FPD_Settings_Labels') ) {
 
 		}
 
+		public static function reset( $lang_code= false ) {
+
+			if($lang_code == false)
+				$lang_code = self::get_current_lang_code();
+
+			self::update_default_lang();
+
+			$current_lang = file_get_contents(self::get_default_json_url());
+			$current_lang = json_encode(json_decode($current_lang));
+			update_option('fpd_lang_'.$lang_code, $current_lang);
+
+		}
+
 		public static function get_translation($section, $key) {
-
-			//replace old label keys with new
-			$replace_keys = array(
-				'automated_export:download' => 'pro_export:download'
-			);
-
-			if( isset($replace_keys[$key]) )
-				$key = $replace_keys[$key];
 
 			$lang_code = self::get_current_lang_code();
 
@@ -142,7 +136,7 @@ if( !class_exists('FPD_Settings_Labels') ) {
 		public static function get_labels_object_string() {
 
 			$lang_code = self::get_current_lang_code();
-			
+
 			$current_lang = get_option('fpd_lang_'.$lang_code);
 			if( empty($current_lang) ) {
 
@@ -153,71 +147,6 @@ if( !class_exists('FPD_Settings_Labels') ) {
 			}
 
 			return $current_lang;
-
-		}
-
-		public static function get_active_lang_codes() {
-
-			$multi_langs_enabled = get_option( 'fpd_multi_languages', 'no' );
-			return $multi_langs_enabled === 'yes' ? get_option('fpd_languages', array()) : array();
-			
-		}
-
-		public static function get_labels_configs( $args = array('lang_code' => null) ) {
-
-			$configs = array();
-
-			$textarea_keys = array(
-				'uploaded_image_size_alert',
-				'not_supported_device_info',
-				'info_content',
-				'login_required_info'
-			);
-
-			if( $args['lang_code'] ) //get lang code from url
-				$current_lang_code = $args['lang_code'];
-			else {
-				$current_lang_code = self::get_current_lang_code();
-			}
-
-			$multi_langs_enabled = fpd_get_option( 'fpd_multi_languages' );
-			if( $multi_langs_enabled ) {
-
-				$configs['lang_codes'] = self::get_active_lang_codes();
-
-				if( !empty($configs['lang_codes']) )
-					$current_lang_code = in_array( $current_lang_code, $configs['lang_codes'] ) ? $current_lang_code : $configs['lang_codes'][0];
-
-			}
-			
-			$current_lang = self::get_current_lang($current_lang_code);			
-			$default_lang = self::get_default_lang();
-			
-			$labels_options = array();
-			foreach($default_lang as $key_section => $section) {
-
-				$labels_options[$key_section] = array();
-				foreach($section as $key_option_entry => $option_entry) {
-
-					$label_option_data = array(
-						'title' => str_replace( ':', ': ', str_replace('_', ' ', $key_option_entry) ), //replace _ with whitespace and : with :whitespace
-						'default' => $option_entry,
-						'id' => $key_option_entry,
-						'type' => in_array($key_option_entry, $textarea_keys) ? 'textarea' : 'text',
-						'value' => isset($current_lang[$key_section][$key_option_entry]) ? $current_lang[$key_section][$key_option_entry] : $option_entry,
-						'column_width' => 'eight'
-					);
-
-					array_push($labels_options[$key_section], $label_option_data);
-
-				}
-
-			}
-
-			$configs['current_lang'] = $current_lang_code;
-			$configs['labels'] = $labels_options;
-
-			return $configs;
 
 		}
 	}

@@ -108,35 +108,34 @@ if( !class_exists('FPD_Settings_Colors') ) {
 			));
 		}
 
-		public static function get_hex_names_array() {
-			
+		public static function get_hex_names_object_string() {
+
 			return self::convert_object_string_to_json( fpd_get_option( 'fpd_hex_names' ) );
 
 		}
 
 		public static function get_color_prices() {
-			
+
 			return self::convert_object_string_to_json( fpd_get_option( 'fpd_color_prices' ), true );
 
 		}
 
 		private static function convert_object_string_to_json( $obj_str, $val_num = false ) {
-			
+
 			if( empty($obj_str) )
-				return array();
+				return '{}';
 
 			$entries = explode(',', $obj_str);
 
 			$json_arr = array();
 			foreach( $entries as $entry ) {
 
-				//key:value
 				$pair_val = explode(':', $entry);
 				$json_arr[$pair_val[0]] = $val_num ? floatval( $pair_val[1] ) : $pair_val[1];
 
 			}
-			
-			return $json_arr;
+
+			return json_encode( $json_arr );
 
 		}
 

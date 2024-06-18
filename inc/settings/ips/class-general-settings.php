@@ -41,8 +41,16 @@ if( !class_exists('FPD_IPS_General') ) {
 				),
 
 				array(
+					'title' 		=> __( '3D Preview Placement', 'radykal' ),
+					'id' 			=> '3d_preview_placement',
+					'default'		=> 'designer',
+					'type' 			=> 'select',
+					'options'   	=> FPD_Settings_General::get_3d_preview_placement_options()
+				),
+
+				array(
 					'title' 	=> __( 'Design Categories', 'radykal' ),
-					'placeholder' => __( 'Design Categories From Main Settings', 'radykal' ),
+					'placeholder' => __( 'All Design Categories', 'radykal' ),
 					'id' 		=> 'design_categories',
 					'default'	=> '',
 					'type' 		=> 'multiselect',
@@ -58,6 +66,41 @@ if( !class_exists('FPD_IPS_General') ) {
 					'type' 		=> 'multiselect',
 					'class'		=> 'semantic-select',
 					'options'   => self::get_fonts_options()
+				),
+
+				array(
+					'title' 	=> __( 'Background', 'radykal' ),
+					'id' 		=> 'background_type',
+					'default'	=> 'image',
+					'type' 		=> 'radio',
+					'options'   => array(
+						'image' => __('Image', 'radykal'),
+						'color' => __('Color', 'radykal')
+					),
+					'relations' => array(
+						'image' => array(
+							'background_image' => true,
+							'background_color' => false
+						),
+						'color' => array(
+							'background_image' => false,
+							'background_color' => true
+						)
+					)
+				),
+
+				array(
+					'title' 	=> __( 'Background Image', 'radykal' ),
+					'id' 		=> 'background_image',
+					'default'	=> plugins_url( '/assets/img/grid.png', FPD_PLUGIN_ROOT_PHP ),
+					'type' 		=> 'upload',
+				),
+
+				array(
+					'title' 	=> __( 'Background Color', 'radykal' ),
+					'id' 		=> 'background_color',
+					'default'	=> '#ffffff',
+					'type' 		=> 'colorpicker',
 				),
 
 				array(
@@ -136,56 +179,6 @@ if( !class_exists('FPD_IPS_General') ) {
 					'options'   => self::get_product_layouts()
 				),
 
-				array(
-					'title' 	=> __( 'Per-Pixel Detection', 'radykal' ),
-					'id' 		=> 'canvas_per_pixel_detection',
-					'default'	=> '0',
-					'type' 		=> 'select',
-					'class'		=> 'semantic-select',
-					'allowclear'=> true,
-					'options'   => array(
-						"0" => __('No', 'radykal'),
-						"1" => __('Yes', 'radykal'),
-					)
-				),
-
-				array(
-					'title' 		=> __( 'Ruler Position', 'radykal' ),
-					'id' 			=> 'rulerPosition',
-					'default'		=> '',
-					'type' 		=> 'select',
-					'class'		=> 'semantic-select',
-					'options'		=> array(
-						'canvas' 		=> __( 'Canvas', 'radykal' ),
-						'pb' 			=> __( 'Around Printing Box', 'radykal' ),
-					),
-				),
-
-				array(
-					'title' 		=> __('Names & Numbers', 'radykal'),
-					'type' 			=> 'section-title',
-					'id' 			=> 'names-numbers-section',
-					'unbordered'	=> true
-				),
-
-				array(
-					'title' 	=> __( 'Dropdown Values', 'radykal' ),
-					'id' 		=> 'namesNumbersDropdown',
-					'default'	=> '',
-					'type' 		=> 'text',
-					'placeholder' => self::get_names_numbers_dropdown_placeholder()
-				),
-
-				array(
-					'title' 			=> __( 'Entry Price', 'radykal' ),
-					'id' 				=> 'namesNumbersEntryPrice',
-					'placeholder'		=> fpd_get_option('fpd_namesNumbersEntryPrice'),
-					'type' 				=> 'number',
-					'custom_attributes' => array(
-						'min' => 0,
-						'step' => 0.01
-					)
-				),
 
 			));
 		}
@@ -218,17 +211,8 @@ if( !class_exists('FPD_IPS_General') ) {
 				$layouts_options[$fpd_product->ID] = '#'.$fpd_product->ID.' - '.$fpd_product->title;
 
 			}
-			
+
 			return $layouts_options;
-
-		}
-
-		public static function get_names_numbers_dropdown_placeholder() {
-
-			$nn_module_placeholder = fpd_get_option('fpd_namesNumbersDropdown');
-			$nn_module_placeholder = empty( $nn_module_placeholder ) ? __('e.g. S | M | L', 'radykal') : $nn_module_placeholder;
-
-			return $nn_module_placeholder;
 
 		}
 

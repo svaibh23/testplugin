@@ -226,7 +226,7 @@ if( !class_exists('FPD_View') ) {
 		public static function setup_options( $options, $to_JSON = false ) {
 
 			$options_arr = array();
-			
+
 			foreach($options as $key => $value) {
 
 				if( fpd_not_empty($value) ) {
@@ -282,23 +282,6 @@ if( !class_exists('FPD_View') ) {
 						break;
 						case 'threejs_preview_model':
 							$options_arr['threeJsPreviewModel'] = $value;
-						break;
-						case 'custom_texts_parameter_fill':
-							$options_arr['customTextParameters'] = array( 'fill' => $value );
-						break;
-						case 'industry_mode':
-
-							$options_arr['industry'] = array(
-								'type' => $value
-							);
-
-							if($value == 'engraving') {
-								$options_arr['industry']['opts'] = array(
-									'opacity' => floatval( isset($options['industry_mode_engraving_opacity']) ? $options['industry_mode_engraving_opacity'] : 0.5 ),
-									'negative' => isset($options['industry_mode_engraving_negative'])
-								);
-							}
-
 						break;
 					}
 

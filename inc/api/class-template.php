@@ -6,68 +6,38 @@ if( !class_exists('FPD_Template') ) {
 
 	class FPD_Template {
 
+		const FREE_PATH = '/assets/objects-library/products/';
 		const PREMIUM_PATH = '/uploads/fpd_product_templates/';
 
 		public static function get_library_templates(  ) {
 
+			$free_templates_dir = FPD_PLUGIN_DIR . self::FREE_PATH;
 			$premium_templates_dir = WP_CONTENT_DIR . self::PREMIUM_PATH;
-			$premium_templates_url = Fancy_Product_Designer::REMOTE_ASSETS_URL . 'premium-templates/';
 
-			$templates_json = fpd_admin_get_file_content( $premium_templates_url . 'db.json' );
-			
-			if( !$templates_json ) {
-				return array();
-			}
-			
-			$templates_json = @json_decode($templates_json);	
-						
-			if( !is_object($templates_json) )
-				return array();
-
-			//verify genius plan
-			$plan_valid = false;
-			$genius_res = fpd_genius_post_request();			
-			if( is_array($genius_res) && $genius_res['status'] == 'success' ) {
-
-				$genius_client_data = $genius_res['data']['client'];					
-
-				$now = new DateTime();
-				$access_until = new DateTime( $genius_client_data['access_until'] );
-
-				if($genius_client_data['subscription'] == 'premium' && $now < $access_until) {
-
-					$plan_valid = true;
-
-				}	
-
-			}
+			$templates_json = fpd_admin_get_file_content( FPD_PLUGIN_DIR . '/assets/json/product_templates.json' );
+			$templates_json = json_decode($templates_json);
 
 			foreach($templates_json as $catKey => $templatesCat) {
-
-				if( $plan_valid ) {
-					$templatesCat->purchase_url = null;
-				}
 
 				foreach($templatesCat->templates as $templateKey => $template) {
 
 					if( isset($template->free) ) {
 
 						$template->installed = true;
-						$template->file_path = $premium_templates_url.$template->file;
+						$template->file_path = $free_templates_dir.$template->file;
+						$template->file_url = plugins_url( self::FREE_PATH.$template->file, FPD_PLUGIN_ROOT_PHP );
 
 					}
 					else {
 
-						$template->installed = $plan_valid || file_exists($premium_templates_dir.$template->file);
-
-						if( $template->installed ) {
-							$template->file_path = $plan_valid ? $premium_templates_url.$template->file :  $premium_templates_dir.$template->file;
-						}
+						$template->installed = file_exists($premium_templates_dir.$template->file);
+						$template->file_path = $premium_templates_dir.$template->file;
+						$template->file_url = content_url( self::PREMIUM_PATH.$template->file );
 
 					}
 
 					$preview_images = is_array($template->images) ? $template->images : array($template->images);
-					array_walk($preview_images, function(&$value, $key) { $value = Fancy_Product_Designer::REMOTE_ASSETS_URL . 'premium-templates/_preview_imgs/' . $value; } );
+					array_walk($preview_images, function(&$value, $key) { $value = plugins_url($value, FPD_PLUGIN_ADMIN_DIR); } );
 					$template->images = $preview_images;
 
 				}

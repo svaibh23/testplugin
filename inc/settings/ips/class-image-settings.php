@@ -144,18 +144,6 @@ if( !class_exists('FPD_IPS_Image') ) {
 				),
 
 				array(
-					'title' 	=> __( 'Bounding Box Border Radius', 'radykal' ),
-					'id' 		=> 'designs_parameter_bounding_box_borderRadius',
-					'placeholder'	=> get_option('fpd_designs_parameter_bounding_box_borderRadius'),
-					'type' 		=> 'number',
-					'class'		=> 'custom-bb',
-					'custom_attributes' => array(
-						'min' => 0,
-						'step' => 1
-					)
-				),
-
-				array(
 					'title' 	=> __( 'Bounding Box Target', 'radykal' ),
 					'id' 		=> 'designs_parameter_bounding_box_by_other',
 					'placeholder'	=> get_option('fpd_designs_parameter_bounding_box_by_other'),
@@ -241,8 +229,8 @@ if( !class_exists('FPD_IPS_Image') ) {
 				),
 
 				array(
-					'title' 	=> __( 'ImageMagick Filter', 'radykal' ),
-					'id' 		=> 'imagick_filter',
+					'title' 	=> __( 'Filter', 'radykal' ),
+					'id' 		=> 'uploaded_designs_parameter_filter',
 					'default'	=> '',
 					'type' 		=> 'select',
 					'class'		=> 'semantic-select',

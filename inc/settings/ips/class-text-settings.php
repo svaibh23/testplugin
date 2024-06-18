@@ -11,41 +11,6 @@ if( !class_exists('FPD_IPS_Text') ) {
 			return apply_filters('fpd_ips_text_settings', array(
 
 				array(
-					'title' 	=> __( 'Auto-Center', 'radykal' ),
-					'id' 		=> 'custom_texts_parameter_autoCenter',
-					'default'	=> '',
-					'type' 		=> 'select',
-					'class'		=> 'semantic-select',
-					'allowclear'=> true,
-					'options'   => array(
-						"0" => __('No', 'radykal'),
-						"1" => __('Yes', 'radykal'),
-					)
-				),
-
-				array(
-					'title' 	=> __( 'Left', 'radykal' ),
-					'id' 		=> 'custom_texts_parameter_x',
-					'placeholder'	=> get_option('fpd_custom_texts_parameter_x'),
-					'type' 		=> 'number',
-					'custom_attributes' => array(
-						'min' => 0,
-						'step' => 1
-					)
-				),
-
-				array(
-					'title' 	=> __( 'Top', 'radykal' ),
-					'id' 		=> 'custom_texts_parameter_y',
-					'placeholder'	=> get_option('fpd_custom_texts_parameter_y'),
-					'type' 		=> 'number',
-					'custom_attributes' => array(
-						'min' => 0,
-						'step' => 1
-					)
-				),
-
-				array(
 					'title' 	=> __( 'Colors', 'radykal' ),
 					'id' 		=> 'custom_texts_parameter_colors',
 					'placeholder'	=> get_option('fpd_custom_texts_parameter_colors'),

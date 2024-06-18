@@ -27,7 +27,6 @@ if(!class_exists('FPD_WC_Order')) {
 			add_filter( 'woocommerce_order_item_meta_start', array(&$this, 'add_order_item_thumbnail_email') , 10, 4 );
 			add_action( 'phpmailer_init', array(&$this, 'init_phpmailer'));
 
-
 		}
 
 		//add order meta from the cart
@@ -117,7 +116,7 @@ if(!class_exists('FPD_WC_Order')) {
 				}
 
 				if( !empty( $item_thumb_src ) )
-					echo '<div style="float: left; margin-right: 5px; margin-bottom: 5px; width: 30%; min-height: 100px; background: url('.$item_thumb_src.'); background-repeat: no-repeat; background-position: top center; background-size: contain;"></div>';
+					echo '<div style="border: 1px solid #ccc; float: left; margin-right: 5px; margin-bottom: 5px; max-width: 30%; "><img src="'.$item_thumb_src.'" style="height: auto; width: 100%; " /></div>';
 
 			}
 
@@ -168,7 +167,7 @@ if(!class_exists('FPD_WC_Order')) {
 			}
 
 			//show element props
-			if( $item_has_fpd ) {
+			if( $item_has_fpd && fpd_get_option('fpd_order_show_element_props') !== 'none' ) {
 
 				//V3.4.9: data stored in _fpd_data
 				$fpd_data = isset($item['_fpd_data']) ? $item['_fpd_data'] : $item['fpd_data'];
@@ -177,44 +176,17 @@ if(!class_exists('FPD_WC_Order')) {
 
 				$order = json_decode(stripslashes($fpd_data), true);
 
-				$show_elem_props = fpd_get_option('fpd_order_show_element_props');
-				if( $show_elem_props === 'used_colors' ) {
+				if( fpd_get_option('fpd_order_show_element_props') === 'used_colors' ) {
 					echo '<div style="margin-top:10px;">'.implode('', FPD_WC_Cart::get_display_elements( $order['product'], 'used_colors' )).'</div>';
 				}
-				else if($show_elem_props === 'props') {
+				else {
 
-					$display_elements = FPD_WC_Cart::get_display_elements( $order['product'] );					
+					$display_elements = FPD_WC_Cart::get_display_elements( $order['product'] );
 					foreach($display_elements as $display_element) {
-						echo '<div style="margin: 10px 0; clear: both;"><p style="font-weight: bold;font-size:0.95em; margin: 10px 0 0px; text-overflow: ellipsis; white-space: nowrap; max-width: 120px; overflow: hidden;">'.$display_element['title'].'</p>'.$display_element['values'].'</div>';
+						echo '<div style="margin: 10px 0; clear: both;"><p style="font-weight: bold;font-size:0.95em; margin: 10px 0 0px;">'.$display_element['title'].':</p>'.$display_element['values'].'</div>';
 					}
 
 				}
-
-				if( isset($order['bulkVariations']) && sizeof($order['bulkVariations']) > 0 ) {
-
-					require_once(FPD_PLUGIN_DIR.'/inc/addons/class-bulk-variations.php');
-
-					$bulk_variations = $order['bulkVariations'];
-
-					echo '<div style="margin: 10px 0;" class=""fpd-plus-order-bulk-variations>';
-
-					foreach($bulk_variations as $variation) {
-
-						echo '<span style="margin-right: 10px;">'.FPD_Bulk_Variations::create_variation_string($variation['variation']).': <strong>'.$variation['quantity'].'</strong></span>';
-
-
-					}
-
-					echo '</div>';
-
-				}
-
-				if ( isset($order['product']) ) {
-
-					require_once(FPD_PLUGIN_DIR.'/inc/addons/class-names-numbers.php');
-					FPD_Names_Numbers::display_names_numbers_items($order['product']);
-
-				}	
 
 			}
 

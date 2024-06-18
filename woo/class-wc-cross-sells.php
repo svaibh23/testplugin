@@ -6,20 +6,18 @@ if(!class_exists('FPD_WC_Cross_Sells')) {
 
 	class FPD_WC_Cross_Sells {
 
-		private $display = 'none';
-
 		public function __construct() {
 
-			$this->display = get_option('fpd_cross_sells_display', 'none');
+			$display = get_option('fpd_cross_sells_display', 'none');
 
 			//SINGLE PRODUCT PAGE
 			add_action( 'fpd_product_designer_form_end', array(&$this, 'add_product_form_field') );
 			add_action( 'fpd_after_product_designer', array( &$this, 'after_product_designer'), 5 );
 
-			if( $this->display === 'single_before' ) {
+			if( $display === 'single_before' ) {
 				add_action( 'woocommerce_before_single_product', array(&$this, 'cross_sells_display') );
 			}
-			else if( $this->display === 'single_after' || $this->display === 'single_modal' ) {
+			else if( $display === 'single_after' || $display === 'single_modal' ) {
 				add_action( 'woocommerce_after_single_product', array(&$this, 'cross_sells_display') );
 			}
 
@@ -27,10 +25,10 @@ if(!class_exists('FPD_WC_Cross_Sells')) {
 			add_action( 'fpd_wc_add_to_cart', array(&$this, 'fpd_added_to_cart'), 10, 6 );
 			add_filter( 'woocommerce_add_cart_item_data', array(&$this, 'add_cart_item_data'), 10, 2 );
 
-			if( $this->display === 'cart_before' ) {
+			if( $display === 'cart_before' ) {
 				add_action( 'woocommerce_before_cart_table', array(&$this, 'cross_sells_display') );
 			}
-			else if( $this->display === 'cart_after' || $this->display === 'cart_modal' ) {
+			else if( $display === 'cart_after' || $display === 'cart_modal' ) {
 				add_action( 'woocommerce_after_cart', array(&$this, 'cross_sells_display') );
 			}
 
@@ -61,15 +59,13 @@ if(!class_exists('FPD_WC_Cross_Sells')) {
 
 			global $woocommerce;
 
-			if( $this->display === 'none') return;
-
 			$cross_sell_fpd = null;
 
 			if( isset($_GET['cross_sell_key']) ) {
 
 				$cart = $woocommerce->cart->get_cart();
 
-				$cart_item = $woocommerce->cart->get_cart_item( sanitize_key( $_GET['cross_sell_key'] ) );
+				$cart_item = $woocommerce->cart->get_cart_item( $_GET['cross_sell_key'] );
 				if( !empty($cart_item) ) {
 
 					if( isset($cart_item['fpd_data']) )
@@ -83,9 +79,7 @@ if(!class_exists('FPD_WC_Cross_Sells')) {
 
 				jQuery(document).ready(function() {
 
-					if(!fancyProductDesigner) return;
-
-					fancyProductDesigner.addEventListener('productCreate', function() {
+					$selector.on('productCreate', function() {
 
 						var crossSellData = <?php echo is_null($cross_sell_fpd) ? 0 : $cross_sell_fpd; ?>,
 							viewCount = 0;
@@ -130,16 +124,13 @@ if(!class_exists('FPD_WC_Cross_Sells')) {
 
 					$cartForm.off('fpdProductSubmit').on('fpdProductSubmit', function() {
 
-						fancyProductDesigner.viewInstances[0].toDataURL((dataURL) => {
+						fancyProductDesigner.viewInstances[0].toDataURL(function(dataURL) {
 
 								$cartForm.find('input[name="fpd_cross_sell_image"]').val(dataURL);
-								
-								if(!fpd_setup_configs.misc.ajax_add_to_cart_mode)
-                					fancyProductDesigner.toggleSpinner(true);
-
+								fancyProductDesigner.toggleSpinner(true);
 								$cartForm.submit();
 
-							}, {format: 'png', onlyExportable: true})
+							}, 'transparent', {format: 'png', onlyExportable: true})
 
 					});
 

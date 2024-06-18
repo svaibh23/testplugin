@@ -4,13 +4,11 @@
 	require_once(FPD_PLUGIN_DIR.'/inc/settings/ips/class-image-settings.php');
 	require_once(FPD_PLUGIN_DIR.'/inc/settings/ips/class-text-settings.php');
 	require_once(FPD_PLUGIN_DIR.'/inc/settings/ips/class-wc-settings.php');
-	require_once(FPD_PLUGIN_DIR.'/inc/settings/ips/class-addons-settings.php');
 
 	$tabs = array(
 		'general' => __('General', 'radykal'),
 		'image-options' => __('Image Properties', 'radykal'),
 		'custom-text-options' => __('Custom Text Properties', 'radykal'),
-		'addons-options' => __('Addons', 'radykal'),
 	);
 
 	if( get_post_type($post) === 'product')
@@ -22,7 +20,6 @@
 		'general' => FPD_IPS_General::get_options(),
 		'image-options' => FPD_IPS_Image::get_options(),
 		'custom-text-options' => FPD_IPS_Text::get_options(),
-		'addons-options' => FPD_IPS_Addons::get_options(),
 		'woocommerce-options' => FPD_IPS_WC::get_options(),
 	);
 
@@ -64,14 +61,13 @@
 					<tbody>
 						<?php foreach($tabs_option as $option) {
 
-							if($option['type'] == 'select' && $option['id'] != 'layouts') {
-								
+							if($option['type'] == 'select') {
 								$select_options = array(
 									'' => __( 'Use Option From Main Settings', 'radykal' )
 								);
 								$option['options'] = array_merge($select_options, $option['options']);
 							}
-							
+
 							radykal_output_option_item($option);
 						}
 						?>
@@ -99,31 +95,8 @@
 
 		$modal.find('.dropdown').select2({allowClear: false, width: '100%'});
 
-		//auto-center with position
-		$('[name="custom_texts_parameter_autoCenter"]')
-		.change(function() {
-			
-			var $this = $(this),
-				$tbody = $this.parents('tbody');
-
-			const $positionTr = $tbody.find('[name="custom_texts_parameter_x"], [name="custom_texts_parameter_y"]').parents('tr').hide();
-			if(this.value != '') {
-
-				if(this.value == '0') { //custom
-					$positionTr.show();
-				}
-
-			}
-			else {
-				$positionTr.find('input').val(''); //empty values
-			}
-
-
-		});
-
 		//bounding box switcher
-		$('[name="designs_parameter_bounding_box_control"], [name="custom_texts_parameter_bounding_box_control"]')
-		.change(function() {
+		$('[name="designs_parameter_bounding_box_control"], [name="custom_texts_parameter_bounding_box_control"]').change(function() {
 
 			var $this = $(this),
 				$tbody = $this.parents('tbody');
@@ -155,6 +128,7 @@
 			fpdFillForm($modal, $('[name="fpd_product_settings"]').val());
 
 			$modal.find('select').change();
+			$modal.find('[name="background_color"], [name="background_type"]:checked').change();
 
 		})
 		//.click();
@@ -164,7 +138,7 @@
 			var $formFields = $modal.find('input[type="number"],input[type="text"],input[type="hidden"],input[type="radio"]:checked,select,input[type="checkbox"]:checked').filter(':not(.no-serialization)'),
 				serializedObj = fpdSerializeObject($formFields);
 				serializedStr = JSON.stringify(serializedObj);
-			
+
 			$('[name="fpd_product_settings"]').val(serializedStr);
 
 			$modal.parent().removeClass('active').css('display', 'none !important');

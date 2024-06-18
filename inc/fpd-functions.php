@@ -149,7 +149,7 @@ function fpd_get_hex_name( $hex ) {
 
 	$hex =  strtolower (str_replace('#', '', $hex ) );
 	//get hex names, convert into array and make keys lowercase (hex values)
-	$hex_names = FPD_Settings_Colors::get_hex_names_array();
+	$hex_names = json_decode( FPD_Settings_Colors::get_hex_names_object_string(), true );
 
 	if( !is_array($hex_names) )
 		return '';
@@ -221,101 +221,16 @@ function fpd_check_file_list( $files, $dir ) {
 
 }
 
-function fpd_logger($val, $delete_log_file=false) {
+function fpd_logger($val) {
 
 	$dest = WP_CONTENT_DIR . '/fpd_php.log';
 
-	if( $delete_log_file && file_exists( $dest ) ) {
-		@unlink($dest);
-	}
-		
 	$output = date( DATE_RFC7231 ) . PHP_EOL;
 	$output .= (is_array($val) ? json_encode($val, JSON_PRETTY_PRINT) : $val);
 	$output .= PHP_EOL . PHP_EOL;
 
 	error_log($output, 3 , $dest);
 
-}
-
-function fpd_string_list_to_array($val) {
-
-	if( is_array($val) )
-		return $val;
-
-	if ( is_string($val) )
-		return explode(',', str_replace('"', '', $val));
-
-	return array();
-
-}
-
-function fpd_get_domain_from_url( $url)  {
-
-	// Get the host from the URL
-	$host = str_ireplace('www.', '', parse_url($url, PHP_URL_HOST));
-	return $host;
-
-}
-
-function fpd_genius_post_request( $endpoint='client', $license_key=null, $method= 'GET', $body=null ) {
-
-	if ( empty($license_key) )
-		$license_key = get_option('fpd_genius_license_key', '');
-
-	if( empty($license_key) )
-		return null;
-
-	$curl_options = array(
-		CURLOPT_URL => FPD_GENIUS_URL . $endpoint,
-		CURLOPT_RETURNTRANSFER => true,
-		CURLOPT_ENCODING => '',
-		CURLOPT_MAXREDIRS => 10,
-		CURLOPT_TIMEOUT => 0,
-		CURLOPT_FOLLOWLOCATION => true,
-		CURLOPT_CUSTOMREQUEST => $method,
-		CURLOPT_HTTPHEADER => array(
-			"Content-Type: application/json",
-			"X_API_TOKEN: ". $license_key,
-			"X_API_DOMAIN: ". ( fpd_get_domain_from_url( get_site_url() ) )
-		)
-	);
-
-	if( !empty($body) ) {
-
-		$curl_options[CURLOPT_POSTFIELDS] = is_string($body) ? $body : json_encode( $body );
-
-	}
-
-	$curl = curl_init();
-	curl_setopt_array( $curl, $curl_options );
-	$response = curl_exec($curl);
-	curl_close($curl);
-
-	if( $response === false ) {
-
-		fpd_logger( curl_error($curl) );
-		return array(
-			'error' => curl_error($curl),
-		);
-
-	}
-
-	return json_decode( $response , true );
-
-}
-
-function fpd_xss_filter($data) {
-    // Remove any non-printable characters
-    $data = preg_replace('/[\x00-\x1F\x7F]/', '', $data);
-
-    // Remove any characters that are not allowed in HTML
-    $data = preg_replace('/[<>\?\'\"\(\)\[\]]/', '', $data);
-
-    // Remove any characters that are used for XSS attacks
-    $data = str_replace(['<', '>', '\'', '\"', ')', '('], '', $data);
-
-    // Return the filtered data
-    return $data;
 }
 
 ?>

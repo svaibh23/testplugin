@@ -74,15 +74,12 @@ if( !class_exists('Radykal_Settings') ) {
 		public function get_option( $key, $multiselect_to_str=true ) {
 
 			if( get_option($key) === false ) {
-
 				return $this->get_default_option( $key );
 
 			}
 			else {
 
 				$value = get_option( $key );
-				
-				
 				//if option is type of number, it needs to return a value, otherwise its failed
 				if( !$this->not_empty($value) && $this->get_option_type($key) == 'number') {
 
@@ -114,7 +111,7 @@ if( !class_exists('Radykal_Settings') ) {
 		 */
 		public function get_default_option( $key ) {
 
-			if( isset( $this->options[$key] ) && isset( $this->options[$key]['default'] ) ) {				
+			if( isset( $this->options[$key] ) && isset( $this->options[$key]['default'] ) ) {
 				return $this->boolean_string_to_int($this->options[$key]['default']);
 			}
 			return false;
@@ -153,7 +150,6 @@ if( !class_exists('Radykal_Settings') ) {
 			$custom_attributes = isset($parameters['custom_attributes']) ? $parameters['custom_attributes'] : array();
 			$relations = isset($parameters['relations']) ? $parameters['relations'] : array();
 			$placeholder = isset($parameters['placeholder']) ? 'placeholder="'.esc_attr( $parameters['placeholder'] ).'"' : '';
-			$unborderedClass = isset($parameters['unbordered']) && $parameters['unbordered'] ? 'unbordered' : '';
 
 			$input_html = '';
 			$input_class = $class;
@@ -228,7 +224,7 @@ if( !class_exists('Radykal_Settings') ) {
 
 				if( isset($parameters['placeholder']) )
 					$input_html .= '<option value="">'.esc_attr( $parameters['placeholder'] ).'</option>';
-					
+
 				foreach($options as $option_key => $option_val) {
 
 					//select-sortable
@@ -277,7 +273,7 @@ if( !class_exists('Radykal_Settings') ) {
 			}
 
 			?>
-			<tr class="<?php echo $unborderedClass; ?>">
+			<tr>
 				<td <?php echo $type === 'section-title' ? 'colspan="2" class="radykal-section-title"' : 'class="top aligned six wide"'; ?>>
 					<?php
 

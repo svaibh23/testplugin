@@ -27,12 +27,12 @@ if(!class_exists('FPD_Admin_Order')) {
 
 		//add meta box to woocommerce orders
 		public function add_meta_boxes() {
-			
+
 			add_meta_box(
 				'fpd-order',
 				__( 'Fancy Product Designer', 'radykal' ),
 				array( &$this, 'output_meta_box'),
-				array('shop_order', 'woocommerce_page_wc-orders'),
+				'shop_order',
 				'normal',
 				'default'
 			);

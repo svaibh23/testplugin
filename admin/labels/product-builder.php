@@ -101,7 +101,7 @@ if( !class_exists('FPD_Labels_Product_Builder') ) {
 				'locked_desc' => __( 'The user needs to unlock the element in Layers module to edit it.', 'radykal' ),
 				'excludeFromExport' => __( 'Exclude In Export', 'radykal' ),
 				'excludeFromExport_desc' => __( 'Excludes the layer from export.', 'radykal' ),
-				'showInColorSelection' => __( 'Show in Color Selection', 'radykal' ),
+				'showInColorSelection' => __( 'Show in Color Selection [PLUS]', 'radykal' ),
 				'showInColorSelection_desc' => __( 'Shows the elements colors in the color selection panel.', 'radykal' ),
 				'_hexColors' => __( 'Colors', 'radykal' ),
 				'_hexColors_desc' => __( 'One color value: Colorpicker, Multiple color values: Fixed color palette', 'radykal' ),
@@ -130,7 +130,7 @@ if( !class_exists('FPD_Labels_Product_Builder') ) {
 				'editable' => __( 'Editable', 'radykal' ),
 				'chargeAfterEditing' => __( 'Charge After Editing', 'radykal' ),
 				'chargeAfterEditing_desc' => __( 'If the text has price, it will be charged first after the text has been edited.', 'radykal' ),
-				'textNumberPlaceholder' => __( 'Text/Number Placeholder', 'radykal' ),
+				'textNumberPlaceholder' => __( 'Text/Number Placeholder [PLUS]', 'radykal' ),
 				'textNumberPlaceholder_desc' => __( 'Enable the text element as a text or number placeholder to use it with the Names & Numbers module.', 'radykal' ),
 				'numberPlaceholderMin' => __( 'Min. Number', 'radykal' ),
 				'numberPlaceholderMax' => __( 'Max. Number', 'radykal' ),
@@ -156,9 +156,6 @@ if( !class_exists('FPD_Labels_Product_Builder') ) {
 				'minH' => __( 'Min. Height (px)', 'radykal' ),
 				'maxW' => __( 'Max. Width (px)', 'radykal' ),
 				'maxH' => __( 'Max. Height (px)', 'radykal' ),
-				'bounding_box_borderRadius' => __( 'Border Radius', 'radykal' ),
-				'custom_texts_parameter_fill' => __( 'Custom Text Default Color', 'radykal' ),
-				'custom_texts_parameter_fill_desc' => __( 'The default color when customer adds a new text.', 'radykal' ),
 
 				//container
 				'loadingView' => __( 'Loading View...', 'radykal' ),

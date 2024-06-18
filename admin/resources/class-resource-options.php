@@ -11,7 +11,7 @@ if( !class_exists('FPD_Resource_Options') ) {
 			foreach($option_keys as $option_key) {
 
 				if( $option_key == 'enabled_fonts' ) { //get enabled fonts
-					$options[$option_key] = FPD_Fonts::to_data(FPD_Fonts::get_enabled_fonts());
+					$options[$option_key] = json_decode( FPD_Fonts::to_json(FPD_Fonts::get_enabled_fonts()) );
 				}
 				else if( $option_key == 'design_categories' ) { //get design categories
 
@@ -34,6 +34,9 @@ if( !class_exists('FPD_Resource_Options') ) {
 						'stageHeight' 	=> $plugin_options['stageHeight']
 					);
 
+				}
+				else if( $option_key == 'plus_enabled' ) {
+					$options[$option_key] = class_exists('Fancy_Product_Designer_Plus');
 				}
 				else if( $option_key == 'fpd_custom_texts_parameter_patterns' || $option_key == 'fpd_designs_parameter_patterns' ) {
 
@@ -75,50 +78,73 @@ if( !class_exists('FPD_Resource_Options') ) {
 			$all_settings = FPD_Settings::$radykal_settings->settings;
 
 			if( $options_group == 'labels' ) {
-				
-				$labels_config = FPD_Settings_Labels::get_labels_configs( $args );
-				
-				$global_options['labels_config'] = $labels_config;
 
+				$textarea_keys = array(
+					'uploaded_image_size_alert',
+					'not_supported_device_info',
+					'info_content',
+					'login_required_info'
+				);
 
-			}
-			else if( $options_group == 'addons' ) {
+				$languages = apply_filters( 'wpml_active_languages', NULL, 'orderby=id&order=desc&skip_missing=0' );
+				if( $args['lang_code'] ) //get lang code from url
+					$current_lang_code = $args['lang_code'];
+				else if($languages) { //get first lang code from wpml languages
+					$first = reset($languages);
+					$current_lang_code = $first['language_code'];
+				}
+				else { //get locale code
+					$current_lang_code = FPD_Settings_Labels::get_current_lang_code();
+				}
 
-				//get genius plan
-				$genius_res = fpd_genius_post_request();
-				if( is_array($genius_res) && $genius_res['status'] == 'success' ) {
+				$current_lang = FPD_Settings_Labels::get_current_lang($current_lang_code);
+				$default_lang = FPD_Settings_Labels::get_default_lang();
 
-					$genius_client_data = $genius_res['data']['client'];					
+				$labels_options = array();
+				foreach($default_lang as $key_section => $section) {
 
-					$now = new DateTime();
-					$access_until = new DateTime( $genius_client_data['access_until'] );
+					$labels_options[$key_section] = array();
+					foreach($section as $key_option_entry => $option_entry) {
 
-					if($genius_client_data['subscription'] == 'premium' && $now < $access_until) {
-
-						array_push(
-							$all_settings['addons']['3d-preview'],
-							array(
-								'title' 		=> __( '3D Model Manager (Genius)', 'radykal' ),
-								'description' 	=> __( 'Your Genius Plan includes unlimited access to our 3D model library. Use the Manager to add the 3D models you want.', 'radykal' ),
-								'id' 			=> 'fpd_3d_model_installer',
-								'placeholder'	=> __( 'Open Manager', 'radykal' ),
-								'type' 			=> 'button',
-								'unbordered'	=> true
-							),
+						$label_option_data = array(
+							'title' => str_replace( ':', ': ', str_replace('_', ' ', $key_option_entry) ), //replace _ with whitespace and : with :whitespace
+							'default' => $option_entry,
+							'id' => $key_option_entry,
+							'type' => in_array($key_option_entry, $textarea_keys) ? 'textarea' : 'text',
+							'value' => isset($current_lang[$key_section][$key_option_entry]) ? $current_lang[$key_section][$key_option_entry] : $option_entry,
+                            'column_width' => 'eight'
 						);
 
-					}	
+						array_push($labels_options[$key_section], $label_option_data);
+
+					}
 
 				}
 
-				$global_options = $all_settings[$options_group];
+				$global_options[$current_lang_code] = $labels_options;
+
+			}
+			else if( $options_group == 'plus' ) {
+
+				if( class_exists('FPD_Plus_Settings') )
+					$global_options = FPD_Plus_Settings::get_options();
+				else
+					$error = array(
+						'code' => 'fpd_options_group_not_exist',
+						'message' => __('The Fancy Product Designer PLUS add-on is not activated or installed!')
+					);
 
 			}
 			else
 				$global_options = $all_settings[$options_group];
 
 			if( !is_null($error) ) {
-				return new WP_Error( $error['code'], $error['message'] );
+
+				return new WP_Error(
+					$error['code'],
+					$error['message']
+				);
+
 			}
 
 			if( $options_group !== 'labels' ) {
@@ -143,20 +169,11 @@ if( !class_exists('FPD_Resource_Options') ) {
 
 			$options = is_array($options) ? $options : json_decode($options, true);
 
-			if( isset($options['labels_lang_code']) ) {
+			if( isset($options['labels_lang']) ) {
 
-				if( isset($options['reset']) ) {
+				$labels = apply_filters( 'fpd_labels_update', $options['labels'], $options['labels_lang'] );
 
-					if ( !class_exists('FPD_Settings_Labels') )
-						require_once(FPD_PLUGIN_DIR.'/inc/settings/class-labels-settings.php');
-
-					FPD_Settings_Labels::update_all_languages();					
-
-				}
-
-				$labels = apply_filters( 'fpd_labels_update', $options['labels'], $options['labels_lang_code'] );
-
-				update_option('fpd_lang_'.$options['labels_lang_code'], json_encode($labels, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) );
+				update_option('fpd_lang_'.$options['labels_lang'], json_encode($labels, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) );
 
 			}
 			else {
@@ -179,10 +196,11 @@ if( !class_exists('FPD_Resource_Options') ) {
 
 		}
 
-		//deprecated (used in rest api plugin)
 		public static function get_languages() {
 
-			return FPD_Settings_Labels::get_active_lang_codes();
+			$wpml_langs = apply_filters( 'wpml_active_languages', NULL, 'orderby=id&order=desc&skip_missing=0' );
+
+			return is_null( $wpml_langs ) ? array() : $wpml_langs;
 
 		}
 

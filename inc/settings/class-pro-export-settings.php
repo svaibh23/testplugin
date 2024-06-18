@@ -3,15 +3,15 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 
-if( !class_exists('FPD_Settings_Pro_Export') ) {
+if( !class_exists('FPD_Settings_Automated_Export') ) {
 
-	class FPD_Settings_Pro_Export {
+	class FPD_Settings_Automated_Export {
 
 		public static function get_options() {
 
-			$options = apply_filters('fpd_pro_export_settings', array(
+			return apply_filters('fpd_automated_export_settings', array(
 
-				'pro-general' => array(
+				'ae-general' => array(
 
 					array(
 						'title' => __('Output Details', 'radykal'),
@@ -74,20 +74,10 @@ if( !class_exists('FPD_Settings_Pro_Export') ) {
 
 					array(
 						'title' 	=> __( 'E-Mail Attachment', 'radykal' ),
-						'description'	 => __( 'The files will be dispatched as email attachments. Please note that the delivery time may vary depending on the total size and the number of files being generated. 
-						Large batches may lead to extended processing times, potentially maxing out your <a href="http://php.net/manual/en/function.set-time-limit.php" target="_blank">server execution limit</a>. 
-						We recommend conducting a trial run with your typical order volume to ensure that this method aligns with your operational flow and timing requirements.', 'radykal' ),
+						'description'	 => __( 'The file(s) will be sent as attachment(s) in the E-Mail. Depending on the files size and the amount of files that need to generated might take a while and your server will reach its <a href="http://php.net/manual/en/function.set-time-limit.php" target="_blank">maximum execution time</a>. So test if your common order process is convenient for this method.', 'radykal' ),
 						'id' 		=> 'fpd_ae_email_attachment',
 						'default'	=> 'no',
 						'type' 		=> 'checkbox',
-					),
-
-					array(
-						'title' 		=> __( 'Webhook URL', 'radykal' ),
-						'description' 		=> __( 'Enter the URL for a webhook. The print server will transmit a JSON object that includes the URL along with additional relevant data to this specified webhook. For example, you can use a service like Zapier to transfer the print file to any cloud provider of your choice.', 'radykal' ),
-						'id' 			=> 'fpd_pro_export_webhook_url',
-						'default'		=> '',
-						'type' 			=> 'text',
 					),
 
 					array(
@@ -293,70 +283,25 @@ if( !class_exists('FPD_Settings_Pro_Export') ) {
 						'type' 		=> 'checkbox',
 					),
 
-				),
+					array(
+						'title' => __('ADMIN solution', 'radykal'),
+						'type' => 'section-title',
+						'id' => 'admin-section'
+					),
 
-				'printful' => array(
 					array(
-						'title' 		=> __( 'API Token', 'radykal' ),
-						'description' 		=> __( 'Enter the API Token of your Printful store.', 'radykal' ),
-						'id' 			=> 'fpd_printful_api_key',
-						'default'		=> '',
-						'type' 			=> 'password'
+						'title' => __( 'API Key', 'radykal' ),
+						'description' 		=> 'Enter the ADMIN API key. You can find it in the Site Configurations of a connected website in ADMIN.',
+						'id' 		=> 'fpd_ae_admin_api_key',
+						'css' 		=> 'width: 100%;',
+						'type' 		=> 'text',
+						'default'	=> '',
+						'value' => ''
 					),
-					array(
-						'title' 		=> __( 'Sales Profit', 'radykal' ),
-						'description' 		=> __( 'Enter the sales profit. Either a fixed value that will be added to the net price (e.g. 5) or a percentage value (e.g. 15%) - net price * 0.15 = your profit.', 'radykal' ),
-						'id' 			=> 'fpd_printful_profit',
-						'default'		=> '',
-						'type' 			=> 'text',
-						'placeholder' 	=> __( 'For example: 5 or 15%', 'radykal' ),
-					),
-					array(
-						'title' 		=> __( 'Region', 'radykal' ),
-						'description' 		=> __( 'In which region are you going to sell the Printful products.', 'radykal' ),
-						'id' 			=> 'fpd_printful_region',
-						'default'		=> 'US',
-						'type' 			=> 'select',
-						'options'		=> array(
-							'US'		=> __( 'USA', 'radykal' ),
-							'EU'		=> __( 'Europe', 'radykal' ),
-							'AU'		=> __( 'Australia/New Zealand', 'radykal' ),
-							'CA'		=> __( 'Canada', 'radykal' ),
-							'JP'		=> __( 'Japan', 'radykal' ),
-							'MX'		=> __( 'Mexico', 'radykal' ),
-							'worldwide'	=> __( 'Worldwide', 'radykal' ),
-						)
-					),
-					array(
-						'title' 		=> __( 'Enable Order Failure Mail', 'radykal' ),
-						'description' 		=> __( 'If something goes wrong during the order process, the administrator will receive a mail with some details. Otherwise you can view any error in wp-content/fpd_php.log.', 'radykal' ),
-						'id' 			=> 'fpd_printful_failure_admin_mail',
-						'default'		=> 'yes',
-						'type' 			=> 'checkbox'
-					),
+
 				)
 
 			));
-
-			if( !empty( get_option('fpd_genius_license_key', '') ) ) {
-
-				array_unshift($options['pro-general'], 
-					array(
-						'title' 		=> __( 'Export Method', 'radykal' ),
-						'description'	=> __( 'We offer two export methods to create print-ready files.<br><a href="https://support.fancyproductdesigner.com/support/solutions/articles/13000103311-export-methods-explained" target="_blank">More information.</a>', 'radykal' ),
-						'id' 			=> 'fpd_pro_export_method',
-						'default'		=> 'nodecanvas',
-						'type' 			=> 'radio',
-						'options'   	=> array(
-							'nodecanvas' => __('Node Canvas (recommended)', 'radykal'),
-							'svg2pdf' => __('SVG to PDF', 'radykal'),
-						),
-					),
-				);
-
-			}
-
-			return $options;
 
 		}
 
@@ -384,18 +329,3 @@ if( !class_exists('FPD_Settings_Pro_Export') ) {
 	}
 
 }
-
-//deprecated: export addon
-class FPD_Settings_Automated_Export extends FPD_Settings_Pro_Export {
-
-	public static function get_options() {
-
-		$options = array();
-		$options['ae-general'] = array(
-
-		);
-		return apply_filters('fpd_automated_export_settings', $options );
-
-	}
-
-};

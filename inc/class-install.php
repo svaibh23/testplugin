@@ -8,28 +8,9 @@ if(!class_exists('FPD_Install')) {
 
 		const VERSION_NAME = 'fancyproductdesigner_version';
 		const UPDATE_VERSIONS = array(
-			'4.0.6', 
-			'4.1.0', 
-			'4.2.0', 
-			'4.6.2', 
-			'4.6.3', 
-			'4.6.4', 
-			'4.6.8', 
-			'4.7.8', 
-			'6.0.0',
-			'6.0.1',
-			'6.0.2',
-			'6.0.8',
-			'6.0.9',
-			'6.0.11',
-			'6.1.0',
-			'6.1.1',
-			'6.1.2',
-			'6.1.4',
-			'6.1.7',
-			'6.2.2'
+			'3.4.0' ,'3.4.3', '4.0.6', '4.1.0', '4.2.0', '4.6.2', '4.6.3', '4.6.4', '4.6.8', '4.7.8'
 		);
-		const UPDATE_LANG_VERSION = '6.1.7';
+		const UPDATE_LANG_VERSION = '4.7.8';
 
 		public function __construct() {
 
@@ -43,7 +24,7 @@ if(!class_exists('FPD_Install')) {
 
 		public function check_version() {
 
-			if( is_admin() && version_compare(get_option(self::VERSION_NAME),  Fancy_Product_Designer::VERSION, '!='))
+			if( is_admin() && get_option(self::VERSION_NAME) != Fancy_Product_Designer::VERSION)
 				$this->upgrade();
 
 		}
@@ -193,10 +174,60 @@ if(!class_exists('FPD_Install')) {
 			if ( !class_exists('FPD_Settings_Labels') )
 				require_once(FPD_PLUGIN_DIR.'/inc/settings/class-labels-settings.php');
 
-				if( $to_version == self::UPDATE_LANG_VERSION )
+			if( $to_version == self::UPDATE_LANG_VERSION )
 				FPD_Settings_Labels::update_all_languages();
 
-			if($to_version === '4.0.6') {
+
+			if($to_version === '3.2.1') {
+
+				if( file_exists(FPD_WP_CONTENT_DIR . '/uploads/fpd_patterns/') )
+					rename(FPD_WP_CONTENT_DIR . '/uploads/fpd_patterns/', FPD_WP_CONTENT_DIR . '/uploads/fpd_patterns_text/');
+
+			}
+			else if($to_version === '3.2.2') {
+
+				delete_option('fpd_lang_default');
+
+				$all_cats = get_terms( 'fpd_design_category', array(
+				 	'hide_empty' => false,
+				 	'orderby' 	 => 'name',
+				));
+
+				foreach($all_cats as $cat) {
+
+					$all_designs = get_posts(array(
+						'posts_per_page' => -1,
+						'post_type' => 'attachment',
+						'tax_query' => array(
+								array(
+									'taxonomy' => 'fpd_design_category',
+									'field'    => 'slug',
+									'terms' => $cat->slug,
+							),
+						),
+					));
+
+					if(sizeof($all_designs) > 0) {
+
+						foreach($all_designs as $design) {
+							update_post_meta( $design->ID, $cat->slug.'_order', $design->menu_order );
+						}
+
+					}
+				}
+
+			}
+			else if($to_version === '3.4.3') {
+
+				update_option( 'fpd_instagram_redirect_uri', plugins_url( '/assets/templates/instagram_auth.php', FPD_PLUGIN_ROOT_PHP ) );
+
+			}
+			else if($to_version === '3.4.3') {
+
+				update_option( 'order:_view_customized_product', get_option( 'order:_email_view_customized_product', 'View Customized Product' ) );
+
+			}
+			else if($to_version === '4.0.6') {
 
 				update_option( 'fpd_customization_required', get_option('fpd_customization_required', 'no') == 'no' ? 'none' : 'any'  );
 
@@ -345,16 +376,6 @@ if(!class_exists('FPD_Install')) {
 					}
 
 				}
-
-			}
-			else if($to_version === '6.1.0') {
-
-				update_option( 'fpd_pro_export_method', 'svg2pdf' );
-
-			}
-			else if($to_version === '6.2.2') {
-
-				update_option( 'fpd_imagick_filter', get_option( 'fpd_uploaded_designs_parameter_filter', 'none' ) );
 
 			}
 

@@ -79,7 +79,6 @@ if( !class_exists('FPD_Labels_Designs') ) {
 				    'designsLibraryRoot' => __( 'Root Directory', 'radykal' ),
 				    'designsLibrarySelectToggle' => __( 'Select/Deselect All', 'radykal' ),
 				    'designsLibraryAdd' => __( 'Add', 'radykal' ),
-					'bounding_box_borderRadius' => __( 'Bounding Box Border Radius', 'radykal' ),
 
 					//container
 					'loadingDesignCategories' => __( 'Loading Design Categories...', 'radykal' ),

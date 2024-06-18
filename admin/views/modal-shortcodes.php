@@ -73,6 +73,13 @@
 					<label><?php _e('Module', 'radykal'); ?></label>
 					<select id="fpd-sc-module-type" style="margin-bottom: 10px;">
 						<option disabled selected value><?php _e('Select Module', 'radykal'); ?></option>
+						<option value="products"><?php _e('Products', 'radykal'); ?></option>
+						<option value="images"><?php _e('Images', 'radykal'); ?></option>
+						<option value="designs"><?php _e('Designs', 'radykal'); ?></option>
+						<option value="text"><?php _e('Text', 'radykal'); ?></option>
+						<option value="manage-layers"><?php _e('Manage Layers', 'radykal'); ?></option>
+						<option value="text-layers"><?php _e('Text Layers', 'radykal'); ?></option>
+						<option value="layouts"><?php _e('Layouts', 'radykal'); ?></option>
 						<?php do_action( 'fpd_shortcode_module_options' ); ?>
 					</select>
 					<br /><br />

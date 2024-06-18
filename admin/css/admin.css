@@ -15,7 +15,7 @@
 }
 #fpd-react-root,
 .ui.modals {
-  font-family: Lato, 'Helvetica Neue', Helvetica, sans-serif;
+  font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
 }
 /**************************
 **** FPD BACKEND *******
@@ -156,15 +156,6 @@ body.fpd-backend .wrap {
 #fpd-modal-shortcodes textarea {
   height: 40px;
 }
-
-.fpd-print-jobs-table {
-  margin-bottom: 40px !important;
-}
-
-.fpd-print-jobs-table .pagination.menu {
-  padding: 0;
-}
-
 /**************************
 **** POST
 **************************/
@@ -208,12 +199,4 @@ body.fpd-backend .wrap {
 #fpd-modal-ips .select2 *:focus {
   box-shadow: none !important;
   outline: none !important;
-}
-
-.gform-settings__content {
-  max-width: inherit;
-}
-
-#fpd-modal-ips .unbordered td {
-  border: none !important;
 }

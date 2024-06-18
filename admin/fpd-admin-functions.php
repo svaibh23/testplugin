@@ -6,7 +6,6 @@ function fpd_admin_get_file_content( $file ) {
 
 	$result = false;
 	if( function_exists('curl_exec') ) {
-
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $file);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -14,11 +13,6 @@ function fpd_admin_get_file_content( $file ) {
 		curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
 		$result = curl_exec($ch);
 		curl_close($ch);
-
-		if( $result === false ) {
-			//fpd_logger( curl_error($ch) );
-		} 
-
 	}
 
 	//if curl does not work, use file_get_contents
@@ -26,11 +20,15 @@ function fpd_admin_get_file_content( $file ) {
 		$result = @file_get_contents($file);
 	}
 
-	return $result !== false ? $result : false;
+	if($result !== false) {
+		return $result;
+	}
+	else {
+		return false;
+	}
 
 }
 
-//deprecated: export addon
 function fpd_admin_write_file_content( $file_url, $local_file ) {
 
 	$result = false;
@@ -57,7 +55,12 @@ function fpd_admin_write_file_content( $file_url, $local_file ) {
 		$result = @file_put_contents($local_file, fopen($file_url, 'r'));
 	}
 
-	return $result !== false ? $result : false;
+	if($result !== false) {
+		return $result;
+	}
+	else {
+		return false;
+	}
 
 }
 
@@ -161,7 +164,7 @@ function fpd_output_admin_notice( $type, $headline, $message, $condition=true, $
 	if( $condition && empty($dismiss_option) ) {
 
 		?>
-		<div class="notice notice-<?php echo $type.$inline; ?> fpd-dismiss-notification" style="position: relative;">
+		<div class="notice notice-<?php echo $type.$inline; ?> fpd-dismiss-notification">
 			<?php if($dismissable) echo '<button class="notice-dismiss" value="' . $name . '"></button>'; ?>
 			<?php if($headline) echo '<h4 style="margin-bottom: 5px;">' . $headline . ' </h4>'; ?>
 	        <p><?php echo $message;?></p>
@@ -175,9 +178,6 @@ function fpd_output_admin_notice( $type, $headline, $message, $condition=true, $
 function fpd_admin_copy_file( $file_url, $destination_dir ) {
 
 	if( empty( $file_url ) ) return false;
-
-	if( !file_exists($destination_dir) )
-        wp_mkdir_p( $destination_dir );
 
 	$filename = basename( $file_url );
 

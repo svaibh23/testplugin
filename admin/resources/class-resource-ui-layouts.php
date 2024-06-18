@@ -9,7 +9,7 @@ if( !class_exists('FPD_Resource_UI_Layouts') ) {
 			$res_json = array();
 			$res_json['layouts'] = array();
 
-			$all_layouts = FPD_UI_Layout_Composer::get_layouts();			
+			$all_layouts = FPD_UI_Layout_Composer::get_layouts();
 
 			foreach($all_layouts as $layout) {
 
@@ -20,7 +20,7 @@ if( !class_exists('FPD_Resource_UI_Layouts') ) {
 
 			}
 
-			$res_json['languages'] = FPD_Settings_Labels::get_active_lang_codes();
+			$res_json['languages'] = apply_filters( 'wpml_active_languages', NULL, 'orderby=id&order=desc&skip_missing=0' );
 
 			return $res_json;
 

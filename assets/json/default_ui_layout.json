@@ -3,6 +3,7 @@
 	"plugin_options": {
 		"stageWidth": 1000,
 		"stageHeight": 600,
+		"gridColumns": 2,
 		"initialActiveModule": "",
 		"selectedColor": "#f5f5f5",
 		"boundingBoxColor": "#005ede",
@@ -10,16 +11,19 @@
 		"cornerIconColor": "#000000",
 		"mainBarModules": ["products", "images", "text", "designs"],
 		"actions":  {
-			"left": ["download","print", "preview-lightbox"],
-			"center": ["undo","redo"],
-			"right": ["info"]
-		}
+			"top": ["download","print", "snap", "preview-lightbox"],
+			"right": ["magnify-glass", "zoom", "reset-product", "qr-code"],
+			"bottom": ["undo","redo"],
+			"left": ["manage-layers","info","save","load"]
+		},
+		"toolbarPlacement": "smart"
 	},
-	"container_classes": "fpd-container fpd-sidebar fpd-shadow-1",
+	"container_classes": "fpd-container fpd-topbar fpd-views-inside-left fpd-shadow-1 fpd-top-actions-centered fpd-bottom-actions-centered",
 	"css_colors": {
 		"primary_color": "#000000",
 		"secondary_color": "#27ae60"
 	},
 	"custom_css": "",
 	"toolbar_exclude_tools": []
+
 }

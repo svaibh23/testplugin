@@ -90,17 +90,13 @@ if( !class_exists('FPD_Product') ) {
 			$products = array();
 			if( fpd_table_exists(FPD_PRODUCTS_TABLE) ) {
 
-				$where = empty($where) ? $wpdb->prepare( 'WHERE type="%s"', $type) : $wpdb->prepare( 'WHERE type="%s" AND ', $type ) . $where;
-				
-				if( !preg_match('/^[a-zA-Z]+\\s(ASC|DESC)$/', $order_by) )
-					$order_by = '';				
-				$order_by = empty($order_by) ? '' : 'ORDER BY '. $order_by;
-				
-				$limit = empty($limit) ? '' : $wpdb->prepare( 'LIMIT %d', $limit );
-				$offset = empty($offset) ? '' : $wpdb->prepare( 'OFFSET %d', $offset );
-				
+				$where = empty($where) ? 'WHERE type="'.$type.'"' : 'WHERE type="'.$type.'" AND '.$where;
+				$order_by = empty($order_by) ? '' : 'ORDER BY '.$order_by;
+				$limit = empty($limit) ? '' : 'LIMIT '.$limit;
+				$offset = empty($offset) ? '' : 'OFFSET '.$offset;
+
  				$products = $wpdb->get_results(
-					"SELECT $cols FROM ".FPD_PRODUCTS_TABLE." $where $order_by $limit $offset"
+ 						"SELECT $cols FROM ".FPD_PRODUCTS_TABLE." $where $order_by $limit $offset"
  				);
 
 			}
@@ -417,7 +413,7 @@ if( !class_exists('FPD_Product') ) {
 
 					$view_options = array_merge($view_options, (array) $catalog_view_options);
 
-				}				
+				}
 
 				$view_json = array();
 				if( $view_count == 0 ) { //only in first view
@@ -440,11 +436,10 @@ if( !class_exists('FPD_Product') ) {
 
 				}
 
-				
 				$view_json['title'] = $catalog_view ? $catalog_view->title : $view->title;
-				$view_json['thumbnail'] = $catalog_view ? $catalog_view->thumbnail : $view->thumbnail;				
+				$view_json['thumbnail'] = $catalog_view ? $catalog_view->thumbnail : $view->thumbnail;
 				$view_json['options'] = FPD_View::setup_options( $view_options );
-				
+
 				if( isset( $view_options['mask'] ) && fpd_not_empty( $view_options['mask'] ) )
 					$view_json['mask'] = $view_options['mask'];
 

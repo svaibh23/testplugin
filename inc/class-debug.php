@@ -7,6 +7,7 @@ if(!class_exists('FPD_Debug')) {
 	class FPD_Debug {
 
 		private $required_filters = array(
+			'body_class' => false, //fancy-product class for body,
 			'woocommerce_cart_item_thumbnail' => false //custom cart item thumbnail
 		);
 		private $required_hooks = array(
@@ -109,15 +110,18 @@ if(!class_exists('FPD_Debug')) {
 
 						?>
 						<p>
-							<?php _e('If a hook or filter is missing in your theme, you can <a href="http://support.fancyproductdesigner.com/support/solutions/articles/5000582912-using-the-debug-mode-to-inspect-any-missing-hooks-in-woocommerce-product-pages">try fo fix it by yourself</a>.', 'radykal'); ?>
+							<?php _e('If a hook or filter is missing in your theme, you can <a href="http://support.fancyproductdesigner.com/support/solutions/articles/5000582912-using-the-debug-mode-to-inspect-any-missing-hooks-in-woocommerce-product-pages">try fo fix it by yourself</a>. This is a theme issue, because authors of themes should follow the woocommerce codex and should not remove the default woocommerce hooks in the templates files. If you can not fix it by yourself after reading the "Troubleshooting" page, please contact the theme author.<br /><strong>I (developer of Fancy Product Designer) will not fix these issues for you.</strong>', 'radykal'); ?>
 						</p>
 					</div>
 				</div>
 				<script type="text/javascript">
 					jQuery(document).ready(function() {
+
 						jQuery('.fpd-theme-check-content h4 span').click(function() {
+
 							jQuery(this).parents('.fpd-theme-check-wrapper').fadeOut(300);
 						});
+
 					});
 				</script>
 				<?php

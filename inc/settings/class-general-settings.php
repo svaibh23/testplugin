@@ -8,9 +8,6 @@ if( !class_exists('FPD_Settings_General') ) {
 
 		public static function get_options() {
 
-			$nn_module_placeholder = fpd_get_option('fpd_namesNumbersDropdown');			
-			$nn_module_placeholder = empty( $nn_module_placeholder ) ? __('e.g. S | M | L', 'radykal') : $nn_module_placeholder;
-
 			return apply_filters('fpd_general_settings', array(
 
 				'display' => array(
@@ -35,7 +32,7 @@ if( !class_exists('FPD_Settings_General') ) {
 
 					array(
 						'title' 		=> __( 'Main Bar Placement', 'radykal' ),
-						'description' 		=> __( 'Set the Placement for the main bar. The sidebar layout will be used.', 'radykal' ),
+						'description' 		=> __( 'Set the Placement for the main bar. Only sidebar layouts can be used with a this option.', 'radykal' ),
 						'id' 			=> 'fpd_main_bar_position',
 						'default'		=> 'default',
 						'type' 			=> 'select',
@@ -43,32 +40,62 @@ if( !class_exists('FPD_Settings_General') ) {
 					),
 
 					array(
+						'title' 		=> __( '3D Preview Placement', 'radykal' ),
+						'description' 		=> __( 'Set the placement for 3D Preview.', 'radykal' ),
+						'id' 			=> 'fpd_3d_preview_placement',
+						'default'		=> 'designer',
+						'type' 			=> 'select',
+						'options'   	=> self::get_3d_preview_placement_options()
+					),
+
+					array(
+						'title' 		=> __( 'Hide On Smartphones', 'radykal' ),
+						'description'	=> __( 'Hide product designer on smartphones and display an information (set in Labels) instead.', 'radykal'),
+						'id' 			=> 'fpd_disable_on_smartphones',
+						'default'		=> 'no',
+						'type' 			=> 'checkbox',
+					),
+
+					array(
+						'title' 		=> __( 'Hide On Tablets', 'radykal' ),
+						'description'	=> __( 'Hide product designer on tablets and display an information (set in Labels)</a> instead.', 'radykal' ),
+						'id' 			=> 'fpd_disable_on_tablets',
+						'default'		=> 'no',
+						'type' 			=> 'checkbox',
+					),
+
+					array(
 						'title' 		=> __( 'Button CSS Classes', 'radykal' ),
 						'description' 		=> __( 'These CSS clases will be added e.g. to the customisation button. Add class names without the dot.', 'radykal' ),
 						'id' 			=> 'fpd_start_customizing_css_class',
-						'default'		=> 'fpd-secondary-btn',
-						'type' 			=> 'text',
+						'css' 			=> 'width:500px;',
+						'default'		=> 'fpd-blue-btn',
+						'type' 			=> 'text'
 					),
 
 					array(
-						'title' 		=> __( 'Multi-Languages', 'radykal' ),
-						'description' 		=> __( 'Enable multiple languages in Labels settings. This option can be used with translation plugins like WPML.', 'radykal' ),
-						'id' 			=> 'fpd_multi_languages',
-						'default'		=> 'no',
-						'type' 			=> 'checkbox',
-						'relations' => array(
-                            'fpd_languages' => true,
-                        )
+						'title' 		=> __( 'User Interface Theme', 'radykal' ),
+						'id' 			=> 'fpd_ui_theme',
+						'default'		=> '',
+						'type' 			=> 'radio',
+						'description'	=>  __( 'Set the main UI theme for the product designer. This will affect the layout options in the UI composer and you might have to reset the actions.', 'radykal' ),
+						'options'		=> array(
+							'' 				=> __( 'Flat: Different layout options (Sidebar, Topbar...)', 'radykal' ),
+							'doyle' 		=> __( 'Doyle: One Sidebar layout and the element toolbar will be displayed in the sidebar.', 'radykal' ),
+						)
 					),
 
 					array(
-						'title' 		=> __( 'Languages', 'radykal' ),
-						'description' 	=> __( 'Select the languages for the Labels.', 'radykal' ),
-						'id' 			=> 'fpd_languages',
-						'default'		=> array('en_US'),
-						'options'		=> array(),
-						'type' 			=> 'multiselect',
-						'unbordered'    => true
+						'title' 		=> __( 'Corner Controls Style', 'radykal' ),
+						'id' 			=> 'fpd_corner_controls_style',
+						'default'		=> 'advanced',
+						'type' 			=> 'radio',
+						'description'	=>  __( 'The style for corner controls when an element is selected.', 'radykal' ),
+						'options'		=> array(
+							'advanced' 		=> __( 'Advanced: Scale, Rotate, Delete, Duplicate', 'radykal' ),
+							'basic' 		=> __( 'Basic: Scale, Rotate', 'radykal' ),
+						),
+                        'unbordered'      => true
 					),
 
 				), //display
@@ -79,6 +106,26 @@ if( !class_exists('FPD_Settings_General') ) {
 						'title' 		=> __('Image Uploads', 'radykal'),
 						'type' 			=> 'section-title',
 						'id' 			=> 'image-upload-section'
+					),
+
+					array(
+						'title' 		=> __( 'Save On Server', 'radykal' ),
+						'id' 			=> 'fpd_type_of_uploader',
+						'default'		=> 'php',
+						'type' 			=> 'radio',
+						'description'	=>  __( 'If your customers can add multiple or large images, then save images on server, otherwise you may inspect some issues when adding the customized product to the cart. The images will be saved in wp-content/uploads/fancy_products_uploads/ directory.', 'radykal' ),
+						'options'		=> array(
+							'php' 			=> __( 'Yes (Highly Recommended)', 'radykal' ),
+							'filereader' 	=> __( 'No (Can lead to issue when adding product to cart)', 'radykal' ),
+						),
+						'relations' 	=> array(
+							'filereader' => array(
+								'fpd_upload_designs_php_logged_in' => false,
+							),
+							'php' => array(
+								'fpd_upload_designs_php_logged_in' => true,
+							)
+						)
 					),
                     
                     array(
@@ -333,14 +380,6 @@ if( !class_exists('FPD_Settings_General') ) {
 					),
 
 					array(
-						'title' 	=> __( 'Custom Text as Textbox', 'radykal' ),
-						'description'	 	=> __( 'Add custom text as textbox (the max. width can be adjusted by side controls)', 'radykal' ),
-						'id' 		=> 'fpd_customTextAsTextbox',
-						'default'	=> 'no',
-						'type' 		=> 'checkbox'
-					),
-
-					array(
 						'title' => __('Products', 'radykal'),
 						'type' => 'section',
 						'id' => 'products-section'
@@ -362,49 +401,6 @@ if( !class_exists('FPD_Settings_General') ) {
 						'type' 		=> 'checkbox',
 					),
 
-					array(
-						'title' => __('Names & Numbers', 'radykal'),
-						'type' => 'section-title',
-						'id' => 'names-numbers-section'
-					),
-	
-					array(
-						'title' 			=> __( 'Dropdown Values', 'radykal' ),
-						'description'	 	=> __( 'Define values for the dropdown for a name & number entry. Useful for different shirt sizes.', 'radykal' ),
-						'id' 				=> 'fpd_namesNumbersDropdown',
-						'default'			=> '',
-						'placeholder'		=> $nn_module_placeholder,
-						'type' 				=> 'text',
-					),
-	
-					array(
-						'title' 			=> __( 'Entry Price', 'radykal' ),
-						'description'	 	=> __( 'An additional price for every entry in the names and numbers list.', 'radykal' ),
-						'id' 				=> 'fpd_namesNumbersEntryPrice',
-						'default'			=> 0,
-						'type' 				=> 'number',
-						'custom_attributes' => array(
-							'min' => 0,
-							'step' => 0.01
-						)
-					),
-					
-					array(
-						'title' => __('Designs', 'radykal'),
-						'type' => 'section-title',
-						'id' => 'designs-section'
-					),
-
-					array(
-						'title' 		=> __( 'Design Categories', 'radykal' ),
-						'description'	=> __( 'Choose specific design categories you want to use in the Designs module. If left empty, all design categories will be used.', 'radykal' ),
-						'placeholder' 	=> __( 'All Design Categories', 'radykal' ),
-						'id' 			=> 'fpd_design_categories',
-						'default'		=> '',
-						'type' 			=> 'multiselect',
-						'class'			=> 'semantic-select',
-						'options'   	=> fpd_output_top_level_design_cat_options()
-					),
 
 				),//modules
 
@@ -499,41 +495,41 @@ if( !class_exists('FPD_Settings_General') ) {
                         'unbordered'      => true
 					),
 
-					// array(
-					// 	'title' => __('Snap', 'radykal'),
-					// 	'type' => 'section',
-					// 	'id' => 'snap-section'
-					// ),
+					array(
+						'title' => __('Snap', 'radykal'),
+						'type' => 'section',
+						'id' => 'snap-section'
+					),
 
-					// array(
-					// 	'title' => __( 'Grid Width', 'radykal' ),
-					// 	'description' 		=> __( 'The width for the grid when snap action is enabled.', 'radykal' ),
-					// 	'id' 		=> 'fpd_action_snap_grid_width',
-					// 	'css' 		=> 'width:60px;',
-					// 	'default'	=> '50',
-					// 	'type' 		=> 'number',
-					// 	'custom_attributes' => array(
-					// 		'min' 	=> 0,
-					// 		'step' 	=> 1
-					// 	),
-                    //     'column_width' => 'eight',
-                    //     'unbordered'      => true
-					// ),
+					array(
+						'title' => __( 'Grid Width', 'radykal' ),
+						'description' 		=> __( 'The width for the grid when snap action is enabled.', 'radykal' ),
+						'id' 		=> 'fpd_action_snap_grid_width',
+						'css' 		=> 'width:60px;',
+						'default'	=> '50',
+						'type' 		=> 'number',
+						'custom_attributes' => array(
+							'min' 	=> 0,
+							'step' 	=> 1
+						),
+                        'column_width' => 'eight',
+                        'unbordered'      => true
+					),
 
-					// array(
-					// 	'title' => __( 'Grid Height', 'radykal' ),
-					// 	'description' 		=> __( 'The height for the grid when snap action is enabled.', 'radykal' ),
-					// 	'id' 		=> 'fpd_action_snap_grid_height',
-					// 	'css' 		=> 'width:60px;',
-					// 	'default'	=> '50',
-					// 	'type' 		=> 'number',
-					// 	'custom_attributes' => array(
-					// 		'min' 	=> 0,
-					// 		'step' 	=> 1
-					// 	),
-                    //     'column_width' => 'eight',
-                    //     'unbordered'      => true
-					// ),					
+					array(
+						'title' => __( 'Grid Height', 'radykal' ),
+						'description' 		=> __( 'The height for the grid when snap action is enabled.', 'radykal' ),
+						'id' 		=> 'fpd_action_snap_grid_height',
+						'css' 		=> 'width:60px;',
+						'default'	=> '50',
+						'type' 		=> 'number',
+						'custom_attributes' => array(
+							'min' 	=> 0,
+							'step' 	=> 1
+						),
+                        'column_width' => 'eight',
+                        'unbordered'      => true
+					),
 
 					array(
 						'title' => __('QR-Code', 'radykal'),
@@ -578,54 +574,12 @@ if( !class_exists('FPD_Settings_General') ) {
 					),
 
 					array(
-						'title' 		=> __( 'Draggable', 'radykal' ),
-						'id' 			=> 'fpd_qr_code_prop_draggable',
-						'default'		=> 'yes',
-						'type' 			=> 'checkbox',
-                        'column_width' 	=> 'eight',
-                        'unbordered'    => true
-					),
-
-					array(
-						'title' => __('Ruler', 'radykal'),
-						'type' 	=> 'section',
-						'id' 	=> 'ruler-section'
-					),
-
-					array(
-						'title' 		=> __( 'Unit of measurement', 'radykal' ),
-						'id' 			=> 'fpd_rulerUnit',
-						'default'		=> 'mm',
-						'type' 			=> 'radio',
-						'description'	=>  __( 'The unit of measurement for the ruler and size tooltip.', 'radykal' ),
-						'options'		=> array(
-							'px' 			=> __( 'Pixel', 'radykal' ),
-							'mm' 			=> __( 'Milimeter', 'radykal' ),
-							'cm' 			=> __( 'Centimeter', 'radykal' ),
-						),
-						'column_width' => 'eight',
-					),
-
-					array(
-						'title' 		=> __( 'Position', 'radykal' ),
-						'id' 			=> 'fpd_rulerPosition',
-						'default'		=> 'canvas',
-						'type' 			=> 'radio',
-						'description'	=>  __( 'The position of the ruler. Around Printing Box requires a printing box in the view.', 'radykal' ),
-						'options'		=> array(
-							'canvas' 		=> __( 'Canvas', 'radykal' ),
-							'pb' 			=> __( 'Around Printing Box', 'radykal' ),
-						),
-						'column_width' => 'eight',
-					),
-
-					array(
-						'title' 		=> __( 'Fixed', 'radykal' ),
-						'description'	=>  __( 'The ruler will always be visible and you can only hide it by using the Ruler action.', 'radykal' ),
-						'id' 			=> 'fpd_rulerFixed',
-						'default'		=> 'no',
-						'type' 			=> 'checkbox',
-                        'unbordered'    => true
+						'title' => __( 'Draggable', 'radykal' ),
+						'id' 		=> 'fpd_qr_code_prop_draggable',
+						'default'	=> 'yes',
+						'type' 		=> 'checkbox',
+                        'column_width' => 'eight',
+                        'unbordered'      => true
 					),
 
 				),
@@ -673,53 +627,19 @@ if( !class_exists('FPD_Settings_General') ) {
 						'title' => __( 'Social Networks', 'radykal' ),
 						'id' 		=> 'fpd_sharing_social_networks',
 						'css' 		=> 'width:300px;',
-						'default'	=> array('facebook', 'twitter', 'email'),
+						'default'	=> array('facebook', 'twitter', 'googleplus', 'email'),
 						'type' 		=> 'multiselect',
 						'options'   => array(
-							"facebook" 	=> 'Facebook',
-							"twitter" 	=> 'Twitter',
-							"linkedin" 	=> 'Linkedin',
+							"facebook" => 'Facebook',
+							"twitter" => 'Twitter',
+							"linkedin" => 'Linkedin',
 							"pinterest" => 'Pinterest',
-							"email" 	=> 'Email',
+							"email" => 'Email',
 						),
                         'unbordered'      => true
 					),
 
 				),
-
-				'ai-services' => array(
-
-					array(
-                        'description' 		=> __( 'A <a href="https://elopage.com/s/radykal/genius-dec00fd9/payment?plan_id=384534&locale=en" target="_blank">Premium subscription of Genius</a> is required in order to use the AI services.', 'radykal' ),
-                        'type' 			=> 'description',
-                        'id' 			=> 'ai-services-desc'
-                    ),
-
-					array(
-						'title' => __( 'Remove Background', 'radykal' ),
-						'description' => __('In the "Edit Image" tab of the toolbar the customer will find an option to remove the background.', 'radykal' ),
-						'id' 		=> 'fpd_ai_removeBG',
-						'default'	=> 'no',
-						'type' 		=> 'checkbox',
-					),
-
-					array(
-						'title' => __( 'Upscale Image', 'radykal' ),
-						'description' => __('Your customer will see a warning as soon as the DPI of an image is below the min. DPI you set in the settings. In this warning there is a button to upscale the image.', 'radykal' ),
-						'id' 		=> 'fpd_ai_superRes',
-						'default'	=> 'no',
-						'type' 		=> 'checkbox',
-					),
-
-					array(
-						'title' => __( 'Text to Images', 'radykal' ),
-						'description' => __('Display "Text to Images" tab in Image module.', 'radykal' ),
-						'id' 		=> 'fpd_ai_text2Img',
-						'default'	=> 'no',
-						'type' 		=> 'checkbox',
-					),
-
-				)
 
 			));
 		}
@@ -753,7 +673,7 @@ if( !class_exists('FPD_Settings_General') ) {
 
 			$values = array(
 				'page'	=> __( 'Page', 'radykal' ),
-				'lightbox'	=> __( 'Lightbox (only working with sidebar layout)', 'radykal' ),
+				'lightbox'	=> __( 'Lightbox', 'radykal' ),
 				'page-customize'	=> __( 'Page after user clicks on the customization button', 'radykal' ),
 			);
 
@@ -774,6 +694,24 @@ if( !class_exists('FPD_Settings_General') ) {
 			}
 
 			return $positions;
+
+		}
+
+		public static function get_3d_preview_placement_options() {
+
+			$options = array(
+				'designer'		=> __( 'Inside Product Designer', 'radykal' ),
+				'before_fpd'	=> __( 'Before Product Designer', 'radykal' ),
+				'after_fpd'		=> __( 'After Product Designer', 'radykal' ),
+			);
+
+			if( class_exists('WooCommerce') ) {
+				$options['before_single_product_summary'] = __( 'Before Single Product Summary (WooCommerce)', 'radykal' );
+			}
+
+			$options['shortcode'] = __( 'Via Shortcode: [fpd_3d_preview]', 'radykal' );
+
+			return $options;
 
 		}
 

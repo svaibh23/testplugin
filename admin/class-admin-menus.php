@@ -80,15 +80,6 @@ if(!class_exists('FPD_Admin_Menus')) {
 
 			add_submenu_page(
 				'fancy_product_designer',
-				 __('Pricing Rules', 'radykal'),
-				 __('Pricing Rules', 'radykal'),
-				 Fancy_Product_Designer::CAPABILITY,
-				 'fpd_pricing_builder',
-				 array( $this, 'output_react' )
-			);
-
-			add_submenu_page(
-				'fancy_product_designer',
 				__('Settings', 'radykal'),
 				__('Settings', 'radykal'),
 				Fancy_Product_Designer::CAPABILITY,
@@ -105,15 +96,6 @@ if(!class_exists('FPD_Admin_Menus')) {
 				array( $this, 'status_page' )
 			);
 
-			add_submenu_page(
-				'fancy_product_designer',
-				__('Genius', 'radykal'),
-				__('Genius', 'radykal'),
-				Fancy_Product_Designer::CAPABILITY,
-				'fpd_genius',
-				array( $this, 'genius_page' )
-			);
-
 		}
 
 		public function action_links( $links ) {
@@ -126,7 +108,7 @@ if(!class_exists('FPD_Admin_Menus')) {
 
 		public function output_react( ) {
 
-			//FPD_Install::do_upgrade('6.1.0');
+			//FPD_Install::do_upgrade('4.6.4');
 
 			if( isset($_GET['update']) ) {
 				FPD_Install::do_upgrade($_GET['update']);
@@ -145,12 +127,6 @@ if(!class_exists('FPD_Admin_Menus')) {
 		public function status_page() {
 
 			require_once(FPD_PLUGIN_ADMIN_DIR . '/views/status-tools.php' );
-
-		}
-
-		public function genius_page() {
-
-			require_once(FPD_PLUGIN_ADMIN_DIR . '/views/genius.php' );
 
 		}
 

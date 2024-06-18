@@ -1,5 +1,6 @@
 <?php
 
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 if(!class_exists('FPD_WC_Dokan')) {

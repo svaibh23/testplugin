@@ -26,13 +26,12 @@ if( !class_exists('FPD_Settings') ) {
 			require_once(FPD_PLUGIN_DIR.'/inc/settings/class-wc-settings.php');
 			require_once(FPD_PLUGIN_DIR.'/inc/settings/class-pro-export-settings.php');
 			require_once(FPD_PLUGIN_DIR.'/inc/settings/class-text-templates-settings.php');
-			require_once(FPD_PLUGIN_DIR.'/inc/settings/class-addons-settings.php');
 
 			self::$radykal_settings = new Radykal_Settings( array(
 					'page_id' => 'fpd_settings',
 				)
 			);
-			
+
 			//first add blocks
 			$blocks = apply_filters('fpd_settings_blocks', array(
 				'general' => array(
@@ -65,34 +64,17 @@ if( !class_exists('FPD_Settings') ) {
 					'global-product-designer' => __('Global Product Designer', 'radykal'),
 					'cross-sells' => __('Cross-Sells', 'radykal'),
 				),
-				'pro-export' => array(
-					'pro-general' => __('Pro Export', 'radykal'),
-					'printful' => __('Printful', 'radykal'),
+				'automated-export' => array(
+					'ae-general' => __('Automated-export', 'radykal'),
 				),
 				'text-templates' => array(
 					'tt-general' => __('Text Templates', 'radykal'),
 				),
-				'addons' => array(
-					'dynamic-views' => __('Dynamic Views', 'radykal'),
-					'color-selection' => __('Color Selection', 'radykal'),
-					'bulk-variations' => __('Bulk Variations', 'radykal'),
-					'pricing-rules' => __('Pricing Rules', 'radykal'),
-					'3d-preview' => __('3D Preview', 'radykal'),
-					'view-thumbnails' => __('View Thumbnails', 'radykal'),
-				),
 				'advanced' => array(
-					'layout' => __('Layout', 'radykal'),
-					'misc' => __('Miscellaneous', 'radykal'),
+					'misc' => __('Miscellanåous', 'radykal'),
 					'troubleshooting' => __('Troubleshooting', 'radykal'),
 				),
 			));
-
-			$genius_license_key = get_option( 'fpd_genius_license_key', '' );
-			if( !empty( $genius_license_key ) ) {
-
-				$blocks['general']['ai-services'] = __('AI Services', 'radykal');
-
-			}
 
 			self::$radykal_settings->add_blocks($blocks);
 
@@ -103,7 +85,6 @@ if( !class_exists('FPD_Settings') ) {
 			self::$radykal_settings->add_block_options( 'modules', $general_options['modules']);
 			self::$radykal_settings->add_block_options( 'actions', $general_options['actions']);
 			self::$radykal_settings->add_block_options( 'social-share', $general_options['social-share']);
-			self::$radykal_settings->add_block_options( 'ai-services', $general_options['ai-services']);
 
 			//add default element options settings
 			$element_properties = FPD_Settings_Default_Element_Options::get_options();
@@ -133,23 +114,12 @@ if( !class_exists('FPD_Settings') ) {
 			self::$radykal_settings->add_block_options( 'global-product-designer', $wc_options['global-product-designer']);
 			self::$radykal_settings->add_block_options( 'cross-sells', $wc_options['cross-sells']);
 
-			//add pro export settings
-			$pro_export_options = FPD_Settings_Pro_Export::get_options();
-			self::$radykal_settings->add_block_options( 'pro-general', $pro_export_options['pro-general']);
-			self::$radykal_settings->add_block_options( 'printful', $pro_export_options['printful']);
-
-			//add addons settings
-			$addons_options = FPD_Settings_Addons::get_options();
-			self::$radykal_settings->add_block_options( 'dynamic-views', $addons_options['dynamic-views']);
-			self::$radykal_settings->add_block_options( 'color-selection', $addons_options['color-selection']);
-			self::$radykal_settings->add_block_options( 'bulk-variations', $addons_options['bulk-variations']);
-			self::$radykal_settings->add_block_options( 'pricing-rules', $addons_options['pricing-rules']);
-			self::$radykal_settings->add_block_options( '3d-preview', $addons_options['3d-preview']);
-			self::$radykal_settings->add_block_options( 'view-thumbnails', $addons_options['view-thumbnails']);
+			//add automated export settings
+			$automated_export_options = FPD_Settings_Automated_Export::get_options();
+			self::$radykal_settings->add_block_options( 'ae-general', $automated_export_options['ae-general']);
 
 			//add advanced settings
 			$advanced_options = FPD_Settings_Advanced::get_options();
-			self::$radykal_settings->add_block_options( 'layout', $advanced_options['layout']);
 			self::$radykal_settings->add_block_options( 'misc', $advanced_options['misc']);
 			self::$radykal_settings->add_block_options( 'troubleshooting', $advanced_options['troubleshooting']);
 

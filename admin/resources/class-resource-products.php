@@ -6,8 +6,6 @@ if( !class_exists('FPD_Resource_Products') ) {
 
 		public static function get_products( $args = array() ) {
 
-			global $wpdb;
-
 			$defaults = array(
 				'include_views' => true,
 				'page' => 1,
@@ -30,29 +28,30 @@ if( !class_exists('FPD_Resource_Products') ) {
 			$offset = null;
 			if( $limit != -1 ) {
 				$offset = ( $page - 1 ) * $limit;
+				$total = sizeof( FPD_Product::get_products() );
+				$num_of_pages = ceil( $total / $limit);
 			}
 			else
 				$limit = '';
 
 			$where = '';
 			if( isset($args['search']) && $args['search'] ) {
-				$where = $wpdb->prepare( "title LIKE %s", '%' . $wpdb->esc_like( $args['search'] ) . '%' );				
+				$where = "title LIKE '%".$args['search']."%'";
 			}
 
 			if( isset($args['category_id']) && $args['category_id'] ) {
 				$where .= empty($where) ? '' : ' AND ';
-				$where .= "ID IN (SELECT product_id FROM ".FPD_CATEGORY_PRODUCTS_REL_TABLE." WHERE category_id=". intval ($args['category_id'] ).")";
+				$where .= "ID IN (SELECT product_id FROM ".FPD_CATEGORY_PRODUCTS_REL_TABLE." WHERE category_id=".$args['category_id'].")";
 			}
 
 			if( isset($args['user_id']) && $args['user_id'] ) {
 				$where .= empty($where) ? '' : ' AND ';
-				$where .= "user_id=". intval( $args['user_id'] );
+				$where .= "user_id=".$args['user_id'];
 			}
-
 
 			$cols = $args['cols'] ? $args['cols'] : '*';
 			$filter_by = $args['filter_by'] ? $args['filter_by'] : 'ID';
-			$sort_by = $args['sort_by'] === 'ASC' ? 'ASC' : 'DESC';
+			$sort_by = $args['sort_by'] ? $args['sort_by'] : 'ASC';
 
 			$products = FPD_Product::get_products( array(
 				'cols' 		=> $cols,
@@ -97,13 +96,6 @@ if( !class_exists('FPD_Resource_Products') ) {
 
 			}
 
-			foreach($products as $product) {
-
-				if( property_exists($product, 'title') ) 
-					$product->title = htmlspecialchars_decode($product->title, ENT_QUOTES);
-
-			}
-
 			return json_decode( json_encode( $products ), true );
 
 		}
@@ -120,7 +112,7 @@ if( !class_exists('FPD_Resource_Products') ) {
 
 			if( isset( $args['duplicate_product_id'] ) ) { //duplicate product from present
 
-				$title = sanitize_text_field( $args['title'] );
+				$title = $args['title'];
 				$type = isset( $args['type'] ) ? $args['type'] : 'catalog';
 
 				//create new product
@@ -129,7 +121,7 @@ if( !class_exists('FPD_Resource_Products') ) {
 				if( $id ) {
 
 					//duplicate source product into new product
-					$source_product = new FPD_Product( intval( $args['duplicate_product_id'] ) );
+					$source_product = new FPD_Product( $args['duplicate_product_id'] );
 					$new_product_id = $source_product->duplicate($id);
 
 					$new_product = new FPD_Product( $new_product_id );
@@ -144,7 +136,7 @@ if( !class_exists('FPD_Resource_Products') ) {
 			}
 			else if( isset( $args['template_id'] ) ) { //create product from My Templates
 
-				$title = sanitize_text_field( $args['title'] );
+				$title = $args['title'];
 
 				//create new product
 				$id = FPD_Product::create( $title );
@@ -152,7 +144,7 @@ if( !class_exists('FPD_Resource_Products') ) {
 				if( $id ) {
 
 					//duplicate source product into new product
-					$source_product = new FPD_Product( intval( $args['template_id'] ) );
+					$source_product = new FPD_Product( $args['template_id'] );
 					$new_product_id = $source_product->duplicate($id);
 
 					$new_product = new FPD_Product( $new_product_id );
@@ -205,11 +197,11 @@ if( !class_exists('FPD_Resource_Products') ) {
 			}
 			else { //create new product
 
-				$title = sanitize_text_field( $args['title'] );
+				$title = $args['title'];
 				$type = isset( $args['type'] ) ? $args['type'] : 'catalog';
 
 				$options = isset( $args['options'] ) ? $args['options'] : '';
-				$thumbnail = isset( $args['thumbnail'] ) ? sanitize_url( $args['thumbnail'] ) : '';
+				$thumbnail = isset( $args['thumbnail'] ) ? $args['thumbnail'] : '';
 
 				$id = FPD_Product::create( $title, $options, $thumbnail, $type );
 
@@ -270,8 +262,8 @@ if( !class_exists('FPD_Resource_Products') ) {
 				//duplicate view
 				if( isset( $args['duplicate_view_id'] )) {
 
-					$source_view = new FPD_View( intval( $args['duplicate_view_id'] ) );
-					$view_data = $source_view->duplicate( sanitize_text_field( $args['view_title'] ) );
+					$source_view = new FPD_View( $args['duplicate_view_id'] );
+					$view_data = $source_view->duplicate( $args['view_title'] );
 
 					$response['ID'] = $view_data->ID;
 					$response['title'] = $view_data->title;
@@ -287,9 +279,9 @@ if( !class_exists('FPD_Resource_Products') ) {
 					$fpd_product = new FPD_Product( $product_id );
 
 					$view_id = $fpd_product->add_view(
-						sanitize_text_field( $args['view_title'] ),
+						$args['view_title'],
 						isset($args['elements']) ? $args['elements'] : '',
-						sanitize_url( $args['thumbnail'] )
+						$args['thumbnail']
 					);
 
 					$response['view_id'] = $view_id;
@@ -304,9 +296,9 @@ if( !class_exists('FPD_Resource_Products') ) {
 				$fpd_product = new FPD_Product( $product_id );
 
 				$response = $fpd_product->update(
-					isset($args['title']) ? htmlspecialchars( sanitize_text_field( $args['title'] ), ENT_QUOTES, 'UTF-8') : null,
+					isset($args['title']) ? $args['title'] : null,
 					isset($args['options']) ? $args['options'] : null,
-					isset($args['thumbnail']) ? sanitize_url( $args['thumbnail'] ) : null
+					isset($args['thumbnail']) ? $args['thumbnail'] : null
 				);
 
 				$response['message'] = __( 'Product Updated.', 'radykal' );
@@ -339,7 +331,7 @@ if( !class_exists('FPD_Resource_Products') ) {
 
 		public static function delete_product( $product_id ) {
 
-			$fpd_product = new FPD_Product( intval( $product_id ) );
+			$fpd_product = new FPD_Product( $product_id );
 
 			if( $fpd_product->delete() )
 				return array( 'message' => __('Product Deleted.', 'radykal') );
@@ -361,7 +353,7 @@ if( !class_exists('FPD_Resource_Products') ) {
 
 		public static function create_product_category( $args ) {
 
-			$id = FPD_Category::create( sanitize_text_field( $args['title'] ) );
+			$id = FPD_Category::create( $args['title'] );
 
 			return array(
 				'message' => __('Product Category Added.', 'radykal'),
@@ -381,7 +373,7 @@ if( !class_exists('FPD_Resource_Products') ) {
 				$fancy_category = new FPD_Category( $category_id );
 
 				$columns = $fancy_category->update(
-					sanitize_text_field( $args['title'] )
+					$args['title']
 				);
 
 				$response['message'] = __('Product Category Title Updated.', 'radykal');
@@ -391,7 +383,7 @@ if( !class_exists('FPD_Resource_Products') ) {
 			}
 			else if( isset( $args['product_id'] ) ) { //update product assignment
 
-				$product_id = intval( $args['product_id'] );
+				$product_id = $args['product_id'];
 				$assign = $args['assign'];
 
 				if( $assign ) { //assign product to category
@@ -419,7 +411,7 @@ if( !class_exists('FPD_Resource_Products') ) {
 
 		public static function delete_product_category( $category_id ) {
 
-			$fancy_category = new FPD_Category( intval( $category_id ) );
+			$fancy_category = new FPD_Category( $category_id );
 
 			if( $fancy_category->delete() )
 				return array( 'message' => __('Product Category Deleted.', 'radykal') );

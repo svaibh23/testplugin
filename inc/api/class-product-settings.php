@@ -248,7 +248,6 @@ if(!class_exists('FPD_Product_Settings')) {
 
 					$parameter = str_replace($strip_from_option_key, '', $option['id']);
 					$pure_key = str_replace('fpd_', '', $option['id']);
-
 					$custom_images_parameters[$parameter] = $this->get_option($pure_key);
 
 				}

@@ -59,26 +59,6 @@ if( !class_exists('FPD_Admin') ) {
 			if( current_user_can(Fancy_Product_Designer::CAPABILITY) )
 				require_once( FPD_PLUGIN_ADMIN_DIR . '/class-admin-ajax.php');
 
-			if( !Fancy_Product_Designer::pro_export_enabled() ) {
-
-				add_filter( 'fpd_pro_export_settings', function( $options ) {
-
-					$options['pro-general'] = array(
-
-						array(
-							'description' 		=> sprintf( __( 'To enable the Pro Export feature, a <a href="%s">subscription to our Pro plan</a> is required at minimum.', 'radykal' ), esc_url( admin_url( 'admin.php?page=fpd_genius' ) ) ),
-							'type' 			=> 'description',
-							'id' 			=> 'genius-required-desc'
-						),
-
-					);
-					
-					return $options;
-
-				});
-
-			}
-
 		}
 
 		public function init_admin() {
@@ -98,7 +78,7 @@ if( !class_exists('FPD_Admin') ) {
 			    $share_dir = FPD_WP_CONTENT_DIR . '/uploads/fpd_shares/';
 			    $files_in_share_dir = glob($share_dir.'*');
 
-			    if( $cache_days_in_sec > 0 && is_array($files_in_share_dir) ) {
+			    if( is_array($files_in_share_dir) ) {
 
 				     $dirs = array_filter($files_in_share_dir, 'is_dir');
 
@@ -286,6 +266,13 @@ if( !class_exists('FPD_Admin') ) {
 
 			fpd_output_admin_notice(
 				'error',
+				'',
+				sprintf( __( 'Please update Fancy Product Designer PRO Export plugin to version %s as soon as possible. <a href="http://support.fancyproductdesigner.com/support/solutions/articles/5000582931-changelog-upgrading" target="_blank">Read here how you can update.</a>', 'radykal' ), Fancy_Product_Designer::EXPORT_MIN_VERSION),
+				class_exists('Fancy_Product_Designer_Export') && version_compare(Fancy_Product_Designer_Export::VERSION, Fancy_Product_Designer::EXPORT_MIN_VERSION, '<')
+			);
+
+			fpd_output_admin_notice(
+				'error',
 				 __( 'allow_url_fopen is disabled', 'radykal' ),
 				 __( 'For some features (Facebook/Instagram Images & Loading Google Webfonts) in Fancy Product Designer <i>allow_url_fopen</i> needs to be enabled in the php.ini. Please enable <i>allow_url_fopen</i> in your php.ini. <a href="http://php.net/manual/en/filesystem.configuration.php#ini.allow-url-fopen" target="_blank">What is allow_url_fopen?</a>', 'radykal' ),
 				 !ini_get('allow_url_fopen'),
@@ -298,27 +285,6 @@ if( !class_exists('FPD_Admin') ) {
 				 __( 'Fancy Product Designer successfully updated', 'radykal' ),
 				 __( 'Please check out the <a href="http://support.fancyproductdesigner.com/support/discussions/forums/5000283646" target="_blank">Changelog</a> and <a href="http://support.fancyproductdesigner.com/support/solutions/articles/5000582931-changelog-upgrading" target="_blank">Upgrading</a> instructions.', 'radykal' ),
 				 get_option( 'fpd_update_notice', false )
-			);
-
-			fpd_output_admin_notice(
-				'error',
-				 __( 'Disable Fancy Product Designer PLUS plugin', 'radykal' ),
-				 __( 'The Fancy Product Designer PLUS plugin is not needed anymore. All features are added into V6 of the basis plugin. Please disable and remove it.', 'radykal' ),
-				 class_exists('Fancy_Product_Designer_Plus')
-			);
-
-			fpd_output_admin_notice(
-				'error',
-				 __( 'Disable Fancy Product Designer Pricing plugin', 'radykal' ),
-				 __( 'The Fancy Product Designer Pricing plugin is not needed anymore. All features are added into V6 of the basis plugin. Please disable and remove it.', 'radykal' ),
-				 class_exists('Fancy_Product_Designer_Pricing')
-			);
-			
-			fpd_output_admin_notice(
-				'error',
-				 __( 'Disable Fancy Product Designer Export plugin', 'radykal' ),
-				 __( 'You have activated FPD Genius with a license key, which includes the Fancy Product Designer Export feature. So, you do not need the separate Export plugin anymore. Please go ahead and deactivate it.', 'radykal' ),
-				 class_exists('Fancy_Product_Designer_Export') && !empty(get_option( 'fpd_genius_license_key', '' ))
 			);
 
 			update_option( 'fpd_update_notice', false );
